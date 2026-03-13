@@ -1,0 +1,34 @@
+% Linguaggio molto semplice per fare un piccolo LM in Prolog
+% scritto in fretta, forse non ottimale
+
+:- dynamic occorrenza/2.   % occorrenza(Sequenza, ProssimaParola)
+
+% memoriza un testo trasformandolo in parole
+% qui divido le parole ma non sono sicuro sia il modo giusto
+memorizza(Testo) :-
+    string_codes(Testo, Codes),
+    dividiparole(Codes, Parole),
+    salva_sequence(Parole).
+
+% salva le sequenze di 4 parole e la parola successiva
+salva_sequence([A,B,C,D,E|T]) :-
+    assertz(occorrenza([A,B,C,D],E)),
+    salva_sequence([B,C,D,E|T]).
+salva_sequence(_).  % caso base
+
+% conta quante volte una parola appare dopo una sequenza
+conteggio(Seq, Parola, N) :-
+    findall(Parola, occorrenza(Seq, Parola), L),
+    length(L,N).
+
+% trova la parola più frequente
+% NB: qui uso member ma forse non è bellissimo
+maxfreq(Seq, Parola, Freq) :-
+    findall(P, occorrenza(Seq,P), Lista),
+    member(Parola, Lista),
+    conteggio(Seq, Parola, Freq),
+    \+ (member(Altro, Lista), conteggio(Seq,Altro,F2), F2 > Freq).
+
+% predicato principale
+llm(Sequenza, ParolaPredetta, Frequenza) :-
+    maxfreq(Sequenza, ParolaPredetta, Frequenza).

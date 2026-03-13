@@ -1,0 +1,38 @@
+#### PRIMA PARTE
+- Mitzenmacher PROBABILITÀ
+	- Ch01_Algo4BigData_Andy_10_2025.pdf
+	-  MITZ_UPFAL_Chapter-1-2025.pdf
+	- MITZ_UPFAL_Chapter-2-2025.pdf
+	- MEDIAN-andy-10-2025.pdf
+		- in realtà è mitz upfal chapter 3
+#### SECONDA PARTE
+- ALGORITMI TARDOS RANDOMIZEDS pdf libro
+	- Cont-Resolution-Slides-Andy.pdf
+		- capitolo 13
+- mmds http://infolab.stanford.edu/~ullman/mmds.html
+	-  Ch03-ABD-Andy_SLIDES 3.pdf slide 10
+		- capitolo 3
+- Tardos
+	- HASH_FUNCTIONS_LUCIO_ANDY_11-25.pdf
+		- capitolo 13.6
+- mmds http://infolab.stanford.edu/~ullman/mmds.html
+	-  Ch03-ABD-Andy_SLIDES 3.pdf slide 10
+		- capitolo 3
+	- DOPO AVER VISTO LE HASH FUNCTION DI LUCIO ANDY
+- mmds http://infolab.stanford.edu/~ullman/mmds.html
+	-  ch04-streams1_Andy_11_25_mac.pdf
+		- capitolo 4
+		- merge dei due pdf
+	- note di prezza Chernoff bound
+		- 2.2
+		- chernoff bound ci sono 2 tipi
+			- prezza 4 tipi(ma in realtà l'ultimo e basta)
+			- mitz (content resolution)
+	- ch04-streams2_Andy_8_12_25.pdf
+		- note di prezza Chernoff bound
+		- 3.1
+	- ch04-streams2_Andy_11_25.pdf
+		- note di prezza Chernoff bound
+		- 5.4.2
+- ch10-graphs1-andy-18-12-23.pdf
+    - fino a slide 18+pdf Valerio con quadrupla da sapere

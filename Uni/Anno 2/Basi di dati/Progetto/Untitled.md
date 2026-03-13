@@ -1,0 +1,70 @@
+## SCHEMA E-R
+per gli attributi obbligatori *
+- Prenotazione
+	- PK: codice prenotazione
+	- foto rifiuto
+	- descrizione oggetto
+	- Cliente FK
+	- lavoratore preso FK
+	- tipo prenotazione
+		- sede o veicolo
+	- Data prenotazione
+	- orario prenotazione
+	- Veicolo FK
+	- Sede associata FK
+	- stato prenotazione
+		- attiva o completata o terminata
+	- costo prenotazione
+- valutazioni
+	- Id valutazione
+	- Codice prenotazione FK
+	- votazione da 1 a 5
+	- unique su stato prenotazione
+- Utente
+	- PK: Codice Fiscale*
+	- Nome*
+	- Cognome*
+	- E-mail*
+	- Password*
+	- Data di nascita*
+	- Indirizzo di domicilio*
+	- Cap di domicilio*
+	- Token per accesso con SPID
+	- numero di telefono
+- turni del lavoratore
+	- id tabella
+	- FK lavoratore
+	- data turno
+	- orario inizio
+	- orario fine
+	- pausa inizio
+	- pausa fine
+- Lavoratore
+	- PK: CID(Codice Identificativo Dipendente)*
+	- Nome*
+	- Cognome*
+	- E-mail*
+	- Password*
+	- Data di nascita*
+	- Ruolo
+		- in sede
+		- con veicolo
+- Veicolo
+	- PK: Targa*
+	- Tipologia
+	- Carico massimo consentito
+	- Stato
+		- disponibile
+		- in uso
+		- in riparazione
+	- FK lavoratore con veicolo
+	- FK su prenotazione
+- Sede Ama
+	- PK: codice sede
+	- CAP*
+	- indirizzo*
+	- FK tabella orari
+	- FK lavoratori in sede
+- cap serviti dalla sede
+	- id cap
+	- Codice sede FK

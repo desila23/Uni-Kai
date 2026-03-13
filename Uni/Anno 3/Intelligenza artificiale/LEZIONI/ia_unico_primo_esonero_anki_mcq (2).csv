@@ -1,0 +1,446 @@
+Front,Back
+"Cos'è l'Intelligenza Artificiale (IA)?
+A) La disciplina che studia come creare sistemi capaci di osservare, comprendere e riprodurre comportamenti intelligenti
+B) Un insieme di programmi che calcolano velocemente
+C) Un qualsiasi sistema che usa reti neurali
+D) Un robot umanoide",A
+"Che cos'è un agente nel contesto dell'IA?
+A) Un semplice sensore passivo
+B) Un'entità autonoma che percepisce l'ambiente tramite sensori e agisce su di esso tramite attuatori
+C) Un algoritmo di ordinamento
+D) Un attuatore fisico senza sensori",B
+"Cosa distingue l'IA forte dall'IA debole?
+A) L'IA forte mira a riprodurre il ragionamento umano, l'IA debole a risolvere problemi specifici
+B) L'IA forte usa reti neurali, la debole no
+C) L'IA debole è più recente della forte
+D) L'IA forte è solo simbolica, la debole solo statistica",A
+"Qual è l'idea alla base del Test di Turing?
+A) Una macchina è intelligente se batte un umano a scacchi
+B) Una macchina è intelligente se può imparare da sola
+C) Una macchina è intelligente se un osservatore umano non distingue se sta parlando con una persona o con una macchina
+D) Una macchina è intelligente se riconosce immagini",C
+"Cosa rappresenta il 'prompt' in un modello linguistico?
+A) Solo la domanda finale
+B) La combinazione di premessa, domanda e contesto
+C) Solo il contesto informativo
+D) Solo le istruzioni del programmatore",B
+"Cos'è l'Instruction Tuning?
+A) Una tecnica per velocizzare il training
+B) Una tecnica per far seguire al modello istruzioni testuali in modo coerente
+C) Una tecnica di compressione dei modelli
+D) Una forma di apprendimento non supervisionato",B
+"Qual è l'ordine corretto nel ciclo dell'agente?
+A) Agire → Percepire → Decidere → Aggiornare
+B) Percepire → Decidere → Agire → Aggiornare
+C) Decidere → Percepire → Aggiornare → Agire
+D) Aggiornare → Agire → Percepire → Decidere",B
+"Che cos'è la sequenza percettiva di un agente?
+A) La sequenza delle azioni compiute
+B) L'insieme delle azioni future possibili
+C) L'insieme di tutte le percezioni passate ricevute dall'agente
+D) La sequenza di stati interni dell'agente",C
+"Come è definita la funzione agente in forma matematica?
+A) f: A → P
+B) f: P* → A
+C) f: S → S
+D) f: A → A*",B
+"Che differenza c'è tra funzione agente e programma agente?
+A) Nessuna, sono la stessa cosa
+B) La funzione agente è astratta, il programma agente è la sua implementazione concreta
+C) La funzione agente è nel software, il programma agente nell'hardware
+D) Il programma agente è astratto, la funzione agente è concreta",B
+"In che senso un agente è autonomo?
+A) Se può spegnersi da solo
+B) Se il suo comportamento dipende dalla sua esperienza e dalle percezioni passate
+C) Se non ha bisogno di sensori
+D) Se non ha bisogno di attuatori",B
+"Che cos'è un agente razionale?
+A) Un agente che imita il comportamento umano
+B) Un agente che sceglie l'azione che massimizza il valore atteso della misura di prestazione
+C) Un agente che non commette mai errori
+D) Un agente che conosce lo stato completo del mondo",B
+"Quale affermazione è corretta sulla razionalità?
+A) Razionalità implica onniscienza
+B) Razionalità non implica onniscienza
+C) Un agente razionale conosce sempre il futuro
+D) Un agente razionale non ha bisogno di sensori",B
+"Quale tra i seguenti NON è uno dei quattro fattori della razionalità?
+A) Misura di prestazione
+B) Conoscenza pregressa
+C) Percezioni presenti e passate
+D) Numero di processori disponibili",D
+"La misura di prestazione deve valutare principalmente:
+A) I processi interni dell'agente
+B) Gli effetti delle azioni sull'ambiente
+C) Il tempo di esecuzione del programma
+D) La quantità di memoria usata",B
+"Nel framework PEAS, cosa indica la lettera P?
+A) Problema
+B) Performance (Prestazione)
+C) Percezione
+D) Planning",B
+"Nel framework PEAS, cosa rappresentano gli 'Actuators'?
+A) I dispositivi che percepiscono l'ambiente
+B) Le azioni possibili a livello logico
+C) I mezzi fisici con cui l'agente agisce sull'ambiente
+D) I modelli interni del mondo",C
+"Un ambiente completamente osservabile è quello in cui:
+A) Non esistono altri agenti
+B) L'agente vede tutto ciò che è rilevante per decidere
+C) L'agente vede l'intero universo fisico
+D) I sensori sono sempre perfetti e continui",B
+"Un ambiente stocastico è:
+A) Un ambiente in cui il tempo non conta
+B) Un ambiente con più agenti
+C) Un ambiente in cui le azioni hanno esiti associati a probabilità
+D) Un ambiente in cui l'agente non ha sensori",C
+"Un ambiente episodico è caratterizzato da:
+A) Azioni che influenzano tutte le decisioni future
+B) Episodi indipendenti, in cui ogni decisione non dipende dal passato
+C) Presenza di altri agenti
+D) Stati continui",B
+"Un ambiente statico è:
+A) Un ambiente che non cambia mentre l'agente decide
+B) Un ambiente che non cambia mai
+C) Un ambiente a stati discreti
+D) Un ambiente senza altri agenti",A
+"In un ambiente noto (known):
+A) L'agente non conosce le regole del gioco
+B) Il progettista conosce il modello di transizione
+C) Le transizioni sono sempre stocastiche
+D) Non si può fare pianificazione offline",B
+"Gli agenti basati su tabella:
+A) Sono molto scalabili
+B) Associano ogni possibile sequenza percettiva a un'azione in una tabella
+C) Non hanno bisogno di sensori
+D) Sono sempre ottimali",B
+"Gli agenti basati su modello mantengono:
+A) Solo una tabella di azioni
+B) Uno stato interno che rappresenta 'cosa credono stia succedendo'
+C) Solo la sequenza percettiva completa
+D) Solo la misura di prestazione",B
+"Gli agenti basati su obiettivo:
+A) Non hanno modello del mondo
+B) Hanno un goal che guida la scelta delle azioni
+C) Non possono pianificare
+D) Non possono fallire",B
+"Gli agenti basati su utilità:
+A) Non usano funzione di utilità
+B) Usano una funzione che assegna un valore numerico agli stati
+C) Sono equivalenti agli agenti reattivi semplici
+D) Non possono operare in ambienti stocastici",B
+"In un agente con apprendimento, il 'critic':
+A) Genera nuove azioni esplorative
+B) Valuta le prestazioni dell'agente e fornisce feedback
+C) Memorizza la sequenza percettiva
+D) Implementa direttamente gli attuatori",B
+"Nel modello di agente con apprendimento, il 'learning element':
+A) Genera percezioni
+B) Migliora il performance element usando il feedback del critic
+C) Misura il tempo di esecuzione
+D) Aggiorna i sensori",B
+"Una rappresentazione atomica degli stati:
+A) Considera solo variabili continue
+B) Rappresenta lo stato come un blocco indivisibile, senza struttura interna esplicita
+C) Usa grafi con relazioni tra oggetti
+D) È adatta solo al machine learning",B
+"La rappresentazione fattorizzata descrive uno stato tramite:
+A) Un solo identificatore
+B) Un vettore di variabili o fattori
+C) Una formula logica unica
+D) Un albero AND-OR",B
+"La rappresentazione strutturata permette di modellare:
+A) Solo stati finiti
+B) Oggetti e relazioni tra di essi
+C) Solo transizioni deterministiche
+D) Solo costi uniformi",B
+"Quale dei seguenti NON è un componente formale di un problema di ricerca?
+A) Stato iniziale
+B) Insieme di azioni
+C) Misura di prestazione dell'agente
+D) Funzione di costo delle azioni",C
+"La funzione Risultato(s,a) in un problema di ricerca indica:
+A) Il costo di eseguire a in s
+B) Lo stato successivo ottenuto eseguendo a in s
+C) Il numero di successori di s
+D) La profondità massima",B
+"Nel mondo dell'aspirapolvere, lo stato include:
+A) Solo la posizione dell'agente
+B) Posizione dell'agente e configurazione di sporco
+C) Solo la quantità totale di sporco
+D) Solo il tempo trascorso",B
+"Nel puzzle dell'otto, lo spazio degli stati è:
+A) Piccolo e senza cicli
+B) Ampio e con possibili cicli
+C) Limitato a 8 stati
+D) Continuo",B
+"Nel problema delle otto regine, una formulazione più efficiente è:
+A) Porre regine a caso sulla scacchiera
+B) Aggiungere una regina per colonna, rispettando i vincoli
+C) Usare solo una regina per riga
+D) Evitare qualsiasi vincolo durante la ricerca",B
+"Cos'è la 'frontiera' in un algoritmo di ricerca?
+A) L'insieme dei nodi già espansi
+B) L'insieme dei nodi generati ma non ancora espansi
+C) L'insieme dei nodi foglia dell'albero reale
+D) L'insieme degli stati obiettivo",B
+"Quale delle seguenti NON è una misura di prestazione per un algoritmo di ricerca?
+A) Completezza
+B) Ottimalità
+C) Tempo
+D) Numero di sensori",D
+"La differenza principale tra spazio degli stati e albero di ricerca è che:
+A) Lo spazio degli stati contiene solo stati obiettivo
+B) L'albero di ricerca rappresenta i cammini esplorati dall'agente
+C) Lo spazio degli stati è sempre finito
+D) L'albero di ricerca non può avere cicli",B
+"La ricerca in ampiezza (BFS) usa una frontiera implementata come:
+A) Pila (LIFO)
+B) Coda (FIFO)
+C) Coda con priorità
+D) Lista non ordinata",B
+"La BFS è:
+A) Sempre ottimale anche con costi diversi
+B) Completa e ottimale se tutte le azioni hanno lo stesso costo
+C) Incompleta su spazi finiti
+D) Mai ottimale",B
+"La ricerca a costo uniforme espande sempre:
+A) Il nodo con profondità minima
+B) Il nodo con costo di cammino g(n) minimo
+C) Il nodo con h(n) minimo
+D) Il nodo generato più recentemente",B
+"La ricerca in profondità (DFS) usa una frontiera implementata come:
+A) Pila (LIFO)
+B) Coda (FIFO)
+C) Coda con priorità
+D) Albero bilanciato",A
+"Un problema tipico della DFS su spazi infiniti è:
+A) Usa troppa memoria
+B) Può non terminare a causa di cammini infiniti
+C) Non trova mai soluzioni
+D) Richiede costi uniformi",B
+"La ricerca in profondità limitata introduce:
+A) Un limite sul numero di azioni totali
+B) Un limite sulla profondità massima esplorata
+C) Un limite sul numero di stati totali
+D) Un limite sul costo totale",B
+"L'approfondimento iterativo combina:
+A) Ampiezza e UCS
+B) Profondità e profondità limitata
+C) Ampiezza e profondità
+D) Greedy e A*",C
+"La ricerca bidirezionale:
+A) Parte solo dal goal
+B) Parte dallo stato iniziale e dallo stato obiettivo, cercando di incontrarsi
+C) È equivalente alla DFS
+D) Può essere usata solo in ambienti stocastici",B
+"Per evitare cicli nella ricerca-grafo si usa tipicamente:
+A) Una tabella con i nodi già esplorati
+B) Una pila ausiliaria
+C) Una euristica casuale
+D) Un limite sul numero di azioni",A
+"In una versione corretta di BFS su grafo:
+A) Si ignorano gli stati già visti
+B) Si espandono più volte gli stessi stati
+C) Non si tiene traccia degli stati raggiunti
+D) Si usa sempre profondità limitata",A
+"Una funzione euristica h(n) stima:
+A) Il costo già sostenuto dall'inizio
+B) Il costo da n al goal
+C) Il costo totale del cammino
+D) Il numero di nodi nella frontiera",B
+"Nella ricerca Best-First classica con f(n)=g(n), l'algoritmo coincide con:
+A) Ricerca in ampiezza
+B) Ricerca a costo uniforme
+C) Ricerca greedy
+D) A*",B
+"La ricerca greedy best-first usa:
+A) Solo g(n)
+B) Solo h(n)
+C) g(n)+h(n)
+D) Nessuna euristica",B
+"L'algoritmo A* usa una funzione:
+A) f(n)=g(n)
+B) f(n)=h(n)
+C) f(n)=g(n)+h(n)
+D) f(n)=g(n)-h(n)",C
+"Una euristica ammissibile per A* deve:
+A) Sovrastimare il costo reale
+B) Non sovrastimare mai il costo reale
+C) Essere sempre esatta
+D) Essere costante",B
+"Una euristica consistente soddisfa:
+A) h(n) ≥ h*(n)
+B) h(n) ≤ c(n,a,n') + h(n')
+C) h(n) = 0 per tutti i nodi
+D) h(n) negativa",B
+"Il principale problema pratico di A* è:
+A) Non è mai ottimale
+B) Usa molta memoria per mantenere la frontiera
+C) Non è completo
+D) Non può usare euristiche",B
+"La Beam Search mantiene in memoria:
+A) Tutti i nodi generati
+B) Solo i k nodi più promettenti
+C) Solo i nodi di profondità massima
+D) Solo i nodi con costo massimo",B
+"Un limite importante della Beam Search è che:
+A) Non è completa in generale
+B) Non può usare euristiche
+C) Non può essere implementata con coda
+D) Non funziona su grafi",A
+"IDA* combina:
+A) A* e ricerca in ampiezza
+B) A* e ricerca in profondità iterativa
+C) Greedy e DFS
+D) UCS e Beam Search",B
+"IDA* pone un limite su:
+A) La profondità
+B) Il valore f(n)
+C) Il numero di nodi
+D) Il numero di azioni",B
+"Un'euristica h2 domina un'euristica h1 se:
+A) h2(n) ≥ h1(n) per tutti i nodi
+B) h2(n) ≤ h1(n) per tutti i nodi
+C) h2 è più veloce da calcolare
+D) h2 è sempre esatta",A
+"Gli agenti classici assumono che l'ambiente sia:
+A) Non osservabile e stocastico
+B) Completamente osservabile e deterministico
+C) Parzialmente osservabile e dinamico
+D) Solo multi-agente",B
+"Nella ricerca locale interessa principalmente:
+A) Il cammino soluzione
+B) Lo stato finale raggiunto
+C) La profondità dell'albero
+D) Il numero esatto di nodi esplorati",B
+"La ricerca locale mantiene in memoria:
+A) Tutto l'albero di ricerca
+B) Solo lo stato corrente (e a volte pochi vicini)
+C) Tutta la frontiera
+D) Tutti i cammini provati",B
+"Nel paesaggio delle funzioni obiettivo, un massimo locale è:
+A) Il punto più alto di tutta la funzione
+B) Un punto più alto dei vicini ma non necessariamente globale
+C) Un punto di valore minimo
+D) Una regione piatta",B
+"Una plateau (altopiano) nella ricerca locale è:
+A) Una discesa ripida
+B) Una zona dove molti stati hanno lo stesso valore
+C) Un massimo globale
+D) Uno stato impossibile",B
+"Nell'Hill Climbing 'steepest-ascent':
+A) Si prende il primo vicino migliore trovato
+B) Si sceglie il vicino con il miglior valore tra tutti
+C) Si sceglie casualmente qualsiasi vicino
+D) Si sceglie il vicino peggiore",B
+"Il riavvio casuale (random restart) nella ricerca locale serve a:
+A) Aumentare la memoria usata
+B) Evitare di restare bloccati in massimi locali
+C) Ridurre il numero di vicini
+D) Rendere la ricerca deterministica",B
+"Nel Simulated Annealing, la 'temperatura' controlla:
+A) Il numero di sensori usati
+B) La probabilità di accettare mosse peggiori
+C) Il numero di stati visitati
+D) Il costo della soluzione",B
+"Con temperatura molto alta, il Simulated Annealing:
+A) Si comporta come Hill Climbing puro
+B) Accetta spesso mosse peggiori
+C) Non modifica mai lo stato
+D) È sempre ottimale",B
+"Il Local Beam Search mantiene:
+A) Un solo stato corrente
+B) k stati correnti, generando successori da tutti
+C) Solo stati obiettivo
+D) Solo stati con h(n)=0",B
+"Gli alberi AND-OR sono usati quando:
+A) L'ambiente è deterministico
+B) L'ambiente è non deterministico
+C) Non esistono azioni
+D) Non esistono sensori",B
+"In un problema sensorless (senza sensori), l'agente ragiona su:
+A) Stati fisici singoli
+B) Stati-credenza (insiemi di stati possibili)
+C) Solo sequenze percettive
+D) Solo azioni",B
+"In un belief state, uno stato è rappresentato come:
+A) Un singolo stato fisico
+B) Un insieme di stati fisici compatibili
+C) Una sola percezione
+D) Una sola azione",B
+"Nella ricerca con osservazioni parziali, l'aggiornamento del belief state avviene:
+A) Solo considerando le azioni
+B) Considerando azioni e percezioni
+C) Considerando solo percezioni
+D) Considerando solo il tempo",B
+"Un agente online:
+A) Pianifica l'intero piano prima di agire
+B) Alterna azione, percezione e decisione passo passo
+C) Non percepisce mai l'ambiente
+D) Non può usare euristiche",B
+"In ambienti ignoti, l'agente deve:
+A) Evitare di agire finché non conosce tutto
+B) Agire per esplorare e costruire un modello dell'ambiente
+C) Usare solo conoscenze predefinite
+D) Ignorare i risultati delle azioni",B
+"LRTA* è un algoritmo che:
+A) È offline e batch
+B) Aggiorna la sua euristica durante l'esplorazione, in tempo reale
+C) Non usa euristiche
+D) Usa solo ricerca in profondità",B
+"In un agente basato sulla conoscenza, la KB contiene:
+A) Solo percezioni grezze
+B) Formule logiche che rappresentano fatti e regole sul mondo
+C) Solo piani di azione
+D) Solo funzioni di utilità",B
+"L'operazione TELL(KB, φ) serve per:
+A) Interrogare la KB
+B) Inserire un nuovo fatto o regola nella KB
+C) Cancellare la KB
+D) Ottimizzare l'inferenza",B
+"L'operazione ASK(KB, α) serve per:
+A) Aggiornare gli assiomi
+B) Verificare se α è conseguenza logica della KB
+C) Aggiungere α alla KB
+D) Misurare il tempo di inferenza",B
+"La sintassi di un linguaggio logico definisce:
+A) Il significato dei simboli
+B) Le regole per costruire frasi ben formate
+C) I modelli che rendono vere le formule
+D) Il metodo di inferenza",B
+"La semantica di un linguaggio logico definisce:
+A) Come scrivere formule
+B) La corrispondenza tra formule e fatti del mondo
+C) Il formato delle prove
+D) La complessità computazionale",B
+"Un modello (interpretazione) in logica è:
+A) Una dimostrazione formale
+B) Un assegnamento di significato ai simboli che rende vere certe formule
+C) Una regola di inferenza
+D) Un insieme di euristiche",B
+"KB ⊨ α significa che:
+A) KB è equivalente ad α
+B) α è conseguenza logica di KB (tutti i modelli di KB sono modelli di α)
+C) α contraddice KB
+D) KB è inconsistente",B
+"Nel ragionamento monotono, aggiungere nuove formule alla KB:
+A) Può invalidare conclusioni precedenti
+B) Non invalida le conclusioni già derivate
+C) Cancella automaticamente vecchie formule
+D) Riduce a zero il numero di modelli",B
+"Nel mondo di Wumpus, l'agente spesso è progettato come:
+A) Agente puramente basato su utilità
+B) Agente reattivo che usa regole condizione-azione
+C) Agente sensorless
+D) Agente senza conoscenza del mondo",B
+"Nel problema delle 8 regine con Hill Climbing, sperimentalmente:
+A) Ha quasi sempre successo (circa >90% dei casi) con mosse laterali
+B) È sempre fallimentare
+C) Richiede esplorazione esaustiva di tutti gli stati
+D) Non può usare mosse laterali",A
+"Nel gioco dell'8 (8-puzzle), A* viene spesso usato con:
+A) Nessuna euristica
+B) Euristiche come numero di tessere fuori posto o distanza di Manhattan
+C) Una sola azione possibile
+D) Euristiche casuali",B

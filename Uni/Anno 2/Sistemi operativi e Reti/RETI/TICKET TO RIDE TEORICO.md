@@ -1,0 +1,220 @@
+##### LIVELLO APPLICAZIONE
+- Internet
+	- DEFINIZIONE
+	- HOST
+	- ISP
+- Protocollo e pila protocollare
+	- Definizione protocollo
+	- Pila Protocollare
+- Definizione livello di applicazione
+-  Architetture
+	- Client Server
+	- Peer to Peer
+		- File torrent e tracker
+		- chunk
+		- Tit for Tat
+- Processi e Socket
+- RTT
+- HTTP
+	- Struttura messaggio
+		- richiesta (metodo- url+numero di porta - versione)
+		- intestazione (info su mittente + preferenze)
+		- corpo del messaggio (SOLO IN ALCUNIMETODI)
+	- Versioni
+- Cookie
+- Web Cash
+	- Proxy
+- Posta elettronica
+	- UA - Mail Server - SMTP - HTTP - IMAP
+- DNS
+	- Server locali e cache
+	- Interrogazioni
+
+
+---
+
+###### LIVELLO TRASPORTO
+- Definizione
+- Multiplexing e Demultiplexing
+- PROTOCOLLO UDP
+	- Struttura segmenti
+	- Checksum
+- Trasferimenti su canali inaffidabili
+	- STOP-AND-WAIT
+		- RDT e versioni
+	- ENTRAMBI PIPELINE
+		- GBN
+		- Ripetizione selettiva
+- PROTOCOLLO TCP
+	- HandShake
+	- Chiusura connessioni
+	- MSS e MTU
+	- Struttura segmenti
+		- Intestazione (cose sotto) + corpo 
+			- numero porta origine e destinazione
+			- checksum
+			- numero sequenza e ACK
+			- `rwnd` + ECE
+	- Timeout e stima RTT su una connessione
+	- Controllo di flusso (`rwnd`)
+	- Congestione
+		- Tre scenari
+	- Controllo di congestione
+		- end-to-end
+		- assistenza della rete
+	- Tassi di invio 
+		- AI/MD
+		- Slow start + fast recovery + congestion avoidance
+	- Evoluzioni
+		- RENO
+		- CUBIC
+		- VEGAS
+	- EDC
+	- Fairness
+	- QUIC
+
+---
+
+###### LIVELLO DI RETE
+- Definizione
+- Protocollo IP (best effort)
+	- Servizi offerti dalla rete
+	- Datagramma IP
+	- Frammentazione
+		- PATH MTU DISCOVERY (ICMP / mitigazione)
+- Funzioni chiave livello di rete
+	- Inoltro 
+		- su destinazione (classfull addressing -> CIDR)
+			- TCAM + Priority Encoder
+		- generalizzato (tabella di flussi)
+			- MATCH+ACTION(+PRIORITY+COUNTER) -> regola
+	- Instradamento 
+- Piano dati e controllo
+	- SDN 
+		- tabella di instradamento -> tabelle di inoltro
+		- API northbound
+		- Livello di dati
+		- API southbound
+			- Open flow (match+action)
+-  Router
+	- tabella di inoltro
+	- Porte di ingresso
+	- Porte di uscita
+	-  Commutazione e struttura di commutazione
+	-  Accodamento in entrata e uscita
+	- Politiche di scarto e algoritmi di scheduling
+- Load balancing
+- Sottorete
+	-  DCHP
+		- Funzioni DCHP
+	-  Come creare sottoreti
+	-  Route aggragation
+	-  ICANN
+- NAT
+- IPv6
+	- tunneling
+- Algoritmi di instradamento
+	-  Dijsktra
+	- Distance vector
+- AS definizione
+	-  Intra AS
+		-  OSPF
+	- Inter AS
+		- BGP
+			- e-BGP - i-BGP - Policy - Annunci
+			- Sessione BGP
+	- Rotte
+		- AS-Path + Next-Hop
+	- Tipologie di instradamento
+		- Next Hop modificato
+		- Next hop non modificato
+		- Patata bollente
+		-  IP anycast
+	- ICMP
+		- Messaggi importanti (echo request e reply - dest. unre. - TTL exp.)
+		- Traceroute
+		- Ping
+- Metodi per gestire una rete
+	- CLI
+	- SNMP / MIB
+	- NETCONF / YANG
+
+
+---
+
+##### LIVELLO COLLEGAMENTO
+- Definizione
+- Servizi offerti
+	- framing 
+	 - controllo del flusso
+	 - accesso al collegamento 
+	 - accessi multipli MAC
+	 - identificare i dispositivi MAC
+- NIC (scheda di rete)
+- Rilevamento errori 
+	- EDC
+	- Bit parità
+	- Checksum
+	- CRC (migliore)
+- Tipologie collegamento
+	- Punto a punto
+	- Broadcast
+		-  PAM e collisioni
+			-  Suddivisione di canale
+				- TDMA
+				- FDMA
+			-  Accesso casuale
+				- SLOTTED ALOHA
+				- UNSLOTTED ALOHA
+				- CSMA
+				- CSMA/CD
+			- A rotazione
+				- Polling
+				- Token passing
+- LAN
+- VLAN
+	- basato su porte
+	- su switch
+	-  EPVN
+	- ID VLAN 802.1Q
+- Indirizzi MAC (vs IP)
+	- ARP
+		- stateless
+		- Come inviare un datagramma al di fuori della LAN
+- Ethernet
+	- Struttura
+	- Inaffidabilità
+	- Collisioni (CSMA/CD)
+	- SWITCH
+		- tabella di commutazione
+- Rete wireless
+	- Caratteristiche
+		- attenuazione
+		- propagazione su più cammini -> tempo di coerenza
+		- SNR e BER
+		- Terminali nascosti
+	- CDMA
+	- WiFi (802.11)
+		- BSS
+		- associazione
+			- frame beacon
+		- CSMA/CA (DIFS e SISFS)
+		- prenotazione (RTS e CTS)
+	-  Bluetooth
+		- Piconet
+		- Bootstrapping
+	- 4G/5G
+		- UE
+		- Base Station
+		- HSS
+		- MME
+		- P-GW e S-GW
+	- LTE 
+		- Piano di controllo e piano di dati
+		- Tunneling
+		- Modalità risparmio energetico
+	- Mobilità
+		- Gestita dai dispositivi
+			- Routing indiretto
+			- Routing diretto
+

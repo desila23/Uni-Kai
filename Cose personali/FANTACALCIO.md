@@ -1,0 +1,32 @@
+# ATTACCANTE
+3 tra
+- [x] MALEN
+- [x] RASPADORI
+- [x] DUROSINMI
+- [x] KILICSOY
+- [x] BELOTTI
+- [x] CHEDDIRA
+- [ ] FERGUSON
+- [x] FULKRUG
+- [x] RATKOV
+
+# CENTROCAMPISTI
+2
+- [x] VERGARA
+- [x] ZIELINSKI
+- [x] TAYLOR
+- [x] BALDANZI
+- [x] MCKENNIE
+- [x] PERRONE
+- [x] GANDELMAN
+- [ ] KOSTIC
+- [ ] MAZZITELLI
+
+# DIFENSORI
+- [x] SOLOMON
+- [x] OSTIGARD
+- [x] BERNASCONI
+- [x] BARTESAGHI
+- [x] BELGHALI
+- [x] KEMPF
+- [x] CELIK

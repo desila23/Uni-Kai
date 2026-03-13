@@ -1,0 +1,146 @@
+1️⃣ Cos’è VERTEX COVER
+
+Dato un grafo G = (V, E):
+
+un vertex cover è un insieme di nodi V′
+tale che ogni arco del grafo ha almeno un estremo in V′
+
+Il problema VC chiede:
+dato G e un numero k, esiste un vertex cover di dimensione ≤ k?
+
+Formalizzazione come problema decisionale:
+- istanze: ⟨G, k⟩
+- soluzioni possibili: sottoinsiemi di nodi
+- predicato: |V′| ≤ k e V′ copre tutti gli archi
+
+Perché VC ∈ NP?
+- il certificato è V′
+- verificare che V′ copra tutti gli archi costa tempo polinomiale
+
+
+2️⃣ Idea della riduzione da 3SAT
+
+Vogliamo dimostrare che VC è NP-completo.
+Riduciamo 3SAT → VC.
+
+Trasformiamo una formula booleana φ in un grafo G tale che:
+φ è soddisfacibile ⇔ G ha un vertex cover piccolo.
+
+Tecnica dei gadget:
+- a ogni variabile → una struttura del grafo
+- a ogni clausola → una struttura del grafo
+- i collegamenti codificano la logica
+
+
+3️⃣ I gadget
+
+🔹 Gadget-variabile
+Per ogni variabile xᵢ:
+- due nodi: uᵢ e ¬uᵢ
+- un arco tra loro
+
+In un vertex cover:
+- va scelto almeno uno dei due
+- uᵢ ∈ V′  → xᵢ = vero
+- ¬uᵢ ∈ V′ → xᵢ = falso
+
+Il vertex cover sceglie il valore della variabile.
+
+
+🔹 Gadget-clausola
+Per ogni clausola cⱼ:
+- tre nodi (uno per letterale)
+- collegati a triangolo
+
+Un triangolo:
+- non può essere coperto con 1 solo nodo
+- servono almeno 2 nodi
+
+Ogni clausola costa almeno 2 nodi.
+
+
+🔹 Collegamenti variabile–clausola
+- se compare xₕ → collego il nodo della clausola a uₕ
+- se compare ¬xₕ → collego il nodo della clausola a ¬uₕ
+
+
+4️⃣ Perché k = n + 2m
+
+n = numero di variabili
+m = numero di clausole
+
+Minimo indispensabile:
+- 1 nodo per ogni variabile → n
+- 2 nodi per ogni clausola → 2m
+
+Ogni vertex cover ha almeno n + 2m nodi.
+Quindi chiediamo:
+esiste un vertex cover di dimensione esattamente n + 2m?
+
+
+🔹 PUNTO 5 — Dal vertex cover all’assegnazione
+
+Ipotesi:
+esiste un vertex cover V′ di dimensione n + 2m.
+
+Gadget-variabile:
+- per coprire l’arco uᵢ—¬uᵢ serve almeno un nodo
+- non possono essere entrambi (supereremmo n + 2m)
+→ esattamente uno dei due è in V′
+
+Interpretazione:
+- uᵢ ∈ V′  → xᵢ = vero
+- ¬uᵢ ∈ V′ → xᵢ = falso
+
+V′ definisce un’assegnazione.
+
+
+Gadget-clausola:
+- il triangolo richiede almeno 2 nodi
+- ne scegliamo esattamente 2
+→ un nodo resta fuori
+
+Quel nodo:
+- è collegato a un nodo-variabile
+- l’arco deve essere coperto
+→ il nodo-variabile è in V′
+→ il letterale è vero
+
+Ogni clausola ha almeno un letterale vero.
+
+Conclusione:
+dal vertex cover otteniamo un’assegnazione che soddisfa φ.
+
+
+🔹 PUNTO 6 — Dall’assegnazione al vertex cover
+
+Ipotesi:
+φ è soddisfacibile con assegnazione a.
+
+Variabili:
+- se a(xᵢ) = vero → mettiamo uᵢ
+- se a(xᵢ) = falso → mettiamo ¬uᵢ
+Usiamo n nodi.
+
+Clausole:
+- ogni clausola ha almeno un letterale vero
+- NON mettiamo il nodo di quel letterale
+- mettiamo gli altri due
+Usiamo 2 nodi per clausola.
+
+Totale nodi:
+n + 2m
+
+Tutti gli archi sono coperti.
+
+Conclusione:
+da un’assegnazione che soddisfa φ otteniamo un vertex cover di dimensione n + 2m.
+
+
+🎯 RISULTATO FINALE
+
+φ soddisfacibile
+⇔
+esiste un vertex cover di dimensione n + 2m
+
+Questa è l’essenza della riduzione da 3SAT a VERTEX COVER.

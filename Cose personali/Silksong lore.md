@@ -1,0 +1,51 @@
+- Mi hanno trasportato in questo regno bloccandomi con dei sigilli strani.
+	- il motivo del perché mi hanno rapito è la mia abilità con la tela
+- Una farfalla mi ha ridato i poteri in qualche modo (credo?)
+- In questo mondo c'è una maledizione.
+- C'è un percorso che porta alla "cittadella", che i pellegrini percorrono ma nessuno è mai riuscito a tornare vivo.
+- I pellegrini fanno parte di questo regno, non vengono da fuori (?)
+- I grani (le monete di gioco) servono per pregare.
+- I pellegrini impazziscono, sicuramente a causa della maledizione
+	- i pellegrini quando mi avvicino vengono avvolti dalla seta, non so se sono io
+- le tessitrici sono arrivate fino a questo reame
+- dopo aver sconfitto la bestia campana sono entrato in un mondo pieno di seta e ho sentito una voce (probabilmente della mia stirpe)
+	- "una forza che si risveglia" -> ho sbloccato un potenziamento -> ***lancio dell'ago***
+- Shakra non ha conosciuto la sua insegnante a quanto pare 
+- C'È QUALCOSA DI MOLTO GROSSO IN ALTO CHE FA TREMARE TUTTA LA ZONA DI GIOCO
+- il barista si domanda se i tizi infettati si muovano così perché hanno ancora una mente pensante o ci sia altro (maligno)
+- Viene chiamata "infestazione filata" da Crimondo
+	- ecco perché mi hanno catturato 
+		- **i ragni (le tessitrici) c'entrano qualcosa???**
+- Qualcuno ha messo delle trappole per orsi `in una zona di cui non so il nome`
+
+- <u>SPOILER</u>: Nella cappella agreste ho infilzato un tizio morto steso sotto un telo e ho preso un emblema.
+
+- Se torni al totem iniziale c'è un tizio che ti sborra in gola per un paio di sbibbolix (peak lore).
+
+- <u>SPOILER</u>: A CUOR CAMPANA CI SONO DEI TIZI CHE SONO LEGATI (QUASI IMPICCATI) CON DELLA SETA E URLANO SOFFERENTI!!
+	- a quanto pare quei fili hanno un effetto simil "infezione" dello splendore, infatti l'eremita della campana dice "vuoi salvarli? il dolore e la fame ritorneranno (o resteranno non ricordo)"
+
+- Un pellegrino a "bossopiano" non c'è più, forse è partito?
+- Appena sono entrato nel gioco Hornet era appesa agli stessi fili dei tizi
+	- forse stava per perdere la coscienza (?)
+- Nella zona delle formiche c'è una statua di una danzatrice, non mi sembra una formica però
+- in alto a sx dell'antro c'è una faccia gigante mostruosa incastrata nel muro
+- a quanto pare la malattia è identica all'infezione
+	- parlano di "ritmo pulsante"
+	- dicono di cercare "più a fondo"
+- Sotto a sx di bossobosco c'è un cimitero, molti pellegrini morivano prima di iniziare il percorso
+- l'assistente del dottor sbobbolox è morto.
+- si dice che una volta superato il "Gran portale" tutti i mali dei pellegrini saranno curati
+- a quanto pare posso uscire dalla zona di gioco e tornare dal luogo da cui mi hanno rapita (IPOTESI MIA)
+- Il barista stava tenendo il corredo per la creazione per qualcun altro che non è più tornato (forse la "Hornet" di questo gioco)
+- a sentiero del peccato c'è un prigioniero chiamato "principe verde"
+- dopo la via del peccato c'è LA BRUMA
+	- una zona piena di fantasmi 
+	- sembra tipo una scatola infinita -> le stanze cambiano ma torni sempre all'uscita
+	- se ti butti di sotto o fuori dai bordi torni all'entrata
+- il duo meccanico era formato da
+	- corpo del principe verde
+	- anima del migliore amico del principe verde
+- L'archivista cardinius dice che la loro "santità" avesse trovato la verità dentro la melodia, o le parole, il tutto che imponeva il silenzio
+	- e l'ha trovata "là nel buio"
+	- LA SANTITÀ È MORTA
