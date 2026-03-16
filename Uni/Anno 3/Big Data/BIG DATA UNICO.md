@@ -1,5 +1,5 @@
-# CH01
-## Verifica dell'identità polinomiale
+# CH01 - Ripasso probabilità
+- Verifica dell'identità polinomiale
 - **DEFINIZIONE DI ALGORITMO RANDOMIZZATO** -> 11-12
 	- Riprendi poi A 25-26
 - **Teorema** ->16
@@ -17,3 +17,5 @@
 	- *applicazione sul test della moltiplicazione tra matrici* -> 53-57
 - **MIN-CUT ALGORITMO** -> 58, 60-64, 65 (solo risultato)
 	- *teorema* -> 67
+
+
