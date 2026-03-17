@@ -1275,3 +1275,343 @@ I vantaggi principali sono:
 - sfrutta **molte macchine in parallelo**
 - è **scalabile**
 - è **robusto ai guasti** (fault tolerance).
+
+
+
+# Distributed Indexing (approfondimento)
+Quando la collezione è troppo grande, non basta una sola macchina.
+
+Serve un sistema distribuito su più nodi:
+```
+cluster
+```
+
+Un problema importante è che:
+- le macchine possono **fallire**
+- possono essere **lente**
+- il lavoro deve continuare comunque
+
+Per questo il sistema deve essere progettato per lavorare in modo **parallelo e robusto**.
+
+
+## Task paralleli
+L’idea è dividere il lavoro in **task indipendenti**.
+
+La collezione viene suddivisa in:
+```
+splits (o slice)
+```
+Ogni split è un sottoinsieme di documenti.
+
+Il master assegna gli split alle macchine disponibili:
+- se una macchina finisce → prende un nuovo task
+- se una macchina fallisce → il task viene riassegnato
+
+Questo garantisce:
+- **bilanciamento del carico**
+- **fault tolerance**
+
+
+---
+
+## Data flow (costruzione dell’indice distribuito)
+![[Pasted image 20260317193923.png]]
+Il flusso è diviso in due fasi principali:
+### 1. Parser (Map phase)
+- ogni parser prende uno split
+- legge i documenti
+- produce coppie:
+
+```
+(term, docID)
+```
+
+Queste coppie vengono salvate in **segment files**, divisi per intervalli di termini (es: a–f, g–p, q–z)
+
+### 2. Inverter (Reduce phase)
+- ogni inverter prende tutte le coppie relative a un insieme di termini
+- raggruppa i dati
+- costruisce le **postings lists**
+
+Quindi:
+```
+(term → lista di docID)
+```
+
+
+## Idea chiave del data flow
+- parser = genera dati
+- inverter = li organizza
+
+Se una macchina si ferma:
+- il master riassegna il lavoro
+
+Sistema quindi:
+- **dinamico**
+- **resistente ai guasti**
+
+
+---
+
+## Tre proprietà importanti
+In un sistema distribuito vogliamo:
+
+### 1. Partition tolerance
+Il sistema continua a funzionare anche se:
+- alcune macchine non comunicano
+
+### 2. Availability
+Il sistema risponde sempre alle richieste
+
+### 3. Consistency
+I dati sono coerenti su tutte le macchine
+
+
+>[!danger] ⚠️ Nella pratica non si possono avere tutte e tre perfettamente (CAP theorem)
+
+
+---
+
+# MapReduce
+È il modello usato per implementare tutto questo.
+
+Schema generale:
+```
+map: input → lista(k, v)
+reduce: (k, lista(v)) → output
+```
+
+Nel nostro caso:
+### Map
+```
+documenti → (term, docID)
+```
+
+### Reduce
+```
+(term, lista(docID)) → postings list
+```
+
+È importante perché:
+- divide il lavoro automaticamente
+- scala su cluster molto grandi
+
+
+---
+
+# Dynamic Indexing
+Finora abbiamo assunto:
+```
+collezione statica
+```
+
+Nella realtà:
+- documenti vengono aggiunti
+- modificati
+- eliminati
+
+Quindi l’indice deve essere aggiornato.
+
+## Approccio base
+Si usano due strutture:
+### 1. Main index
+- indice grande
+- su disco
+### 2. Auxiliary index
+- piccolo
+- in memoria
+- contiene i nuovi documenti
+
+Le query cercano su entrambi e poi uniscono i risultati
+
+## Problema
+Se faccio merge troppo spesso:
+- costo alto
+- rallentamenti
+
+## Logarithmic Merge
+![[Pasted image 20260317193954.png]]
+Soluzione più efficiente.
+
+Si mantengono più indici:
+```
+I0, I1, I2, ...
+```
+
+Ogni indice ha dimensione:
+```
+2^k * n
+```
+
+
+# Struttura
+Hai:
+- `Z0` → in memoria (piccolo)  -> sarebbe l'Auxiliary index
+- `I0, I1, I2, ...` → su disco -> sarebbero i Main index
+
+Dimensioni:
+```
+Z0 ≈ n 
+I0 ≈ n
+I1 ≈ 2n
+I2 ≈ 4n
+I3 ≈ 8n
+...
+```
+
+Ogni livello è il doppio del precedente.
+
+
+# Come funziona (passo passo)
+### 1. Arriva un nuovo dato
+Lo metti in:
+```
+Z0
+```
+
+### 2. Z0 si riempie (raggiunge n)
+Hai due casi:
+#### Caso A: I0 NON esiste
+→ scrivi Z0 su disco come:
+```
+I0
+```
+e svuoti Z0
+
+#### Caso B: I0 esiste
+→ fai merge:
+```
+Z0 + I0 → Z1 (dimensione 2n)
+```
+poi:
+- cancelli I0 -> puoi riutilizzarlo dopo 
+- svuoti Z0
+
+### 3. Ora hai Z1 (2n)
+Stessa logica:
+#### Se I1 NON esiste
+→ Z1 diventa I1
+#### Se I1 esiste
+→ merge:
+```
+Z1 + I1 → Z2 (4n)
+```
+e così via...
+
+
+# Perché è meglio
+## Senza logarithmic merge
+Ogni posting viene toccato:
+```
+T / n volte
+```
+→ pessimo
+
+## Con logarithmic merge
+Ogni posting sale di livello poche volte:
+```
+log(T / n)
+```
+
+Quindi:
+```
+tempo = O(T log(T/n))
+```
+
+👉 molto più efficiente
+
+# Svantaggio
+Quando fai una query:
+- devi cercare in più indici (`I0, I1, I2...`)
+
+→ quindi:
+```
+query più lente
+```
+
+
+---
+
+# Dynamic Indexing nei motori di ricerca
+Due strategie reali:
+1. aggiornamenti incrementali (come sopra)
+2. ricostruzione completa periodica dell’indice
+
+# Caso reale: Twitter (Earlybird)
+Twitter ha esigenze particolari:
+- dati in tempo reale
+- risultati recenti più importanti
+
+## Struttura
+L’indice è diviso in:
+```
+segmenti
+```
+
+Ogni segmento:
+- è piccolo
+- sta in memoria
+- contiene tweet recenti
+
+## Funzionamento
+- nuovi dati → aggiunti in coda
+- query → leggono prima i dati più recenti
+
+Le postings list sono:
+```
+ordinate temporalmente (più recenti prima)
+```
+
+Questo è diverso dal classico:
+```
+ordinamento per docID
+```
+
+
+---
+
+# Index Compression
+Obiettivo:
+```
+ridurre spazio (disco + RAM)
+```
+
+Tipi:
+### Lossless
+- nessuna perdita di informazione
+### Lossy
+- si perde qualcosa
+
+## Idea base
+I docID sono grandi numeri → occupano molti bit
+
+Soluzione:
+```
+memorizzare differenze (gap)
+```
+
+Esempio:
+```
+173, 174
+```
+
+diventa:
+```
+173, +1
+```
+
+Questo usa meno spazio.
+
+## Perché funziona
+Perché le postings list sono:
+```
+ordinate
+```
+
+Quindi le differenze sono piccole → meno bit → più compressione
+
+## Nota importante
+Compressione è utile perché:
+- meno spazio su disco
+- meno dati da leggere → più veloce
+
