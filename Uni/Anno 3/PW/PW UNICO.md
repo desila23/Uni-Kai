@@ -448,3 +448,163 @@ Contiene **tutto il contenuto visibile della pagina**:
 - tabelle
 - video
 
+
+---
+
+## Git Branch
+I branch rappresentano linee di sviluppo parallele e indipendenti all’interno dello stesso repository.
+
+Ogni branch identifica uno stato del progetto in un determinato momento.  
+Il branch principale è generalmente `main`, mentre i branch secondari vengono utilizzati per sviluppare modifiche senza alterare direttamente il ramo principale.
+
+**Tecnicamente:**
+- un branch è un **puntatore a un commit**
+- cambiando branch cambi la versione del progetto
+
+Al termine dello sviluppo, i branch secondari vengono integrati nel `main` tramite operazioni di merge.
+
+![[Pasted image 20260317151850.png|center]]
+
+---
+
+## Idea
+L’utilizzo dei branch consente di:
+- isolare le modifiche
+- lavorare in parallelo
+- mantenere stabile il ramo principale
+
+Ogni branch è tipicamente associato a una specifica funzionalità o modifica.  
+L’integrazione avviene successivamente tramite merge.
+
+**Best practice:**
+- creare **un branch per ogni task**
+- fare merge spesso → evita conflitti grandi alla fine
+
+
+---
+
+## Sintassi
+
+###### Creazione di un nuovo branch:
+```
+git branch <nome>  
+```
+
+Crea un nuovo branch a partire dal commit corrente.
+
+
+###### Cambio di branch:
+```
+git checkout <nome/id>  
+```
+
+Aggiorna la working directory allo stato del branch (o commit) selezionato.
+
+⚠️ Puoi cambiare branch solo se hai salvato le modifiche:
+- `git commit`
+- oppure `git stash`
+
+
+###### HEAD:
+- rappresenta il puntatore al branch o commit corrente
+- indica il contesto di lavoro attuale
+- punta sempre al **commit corrente del branch attivo**
+
+
+###### Salvataggio temporaneo:
+```
+git stash  
+```
+
+Salva le modifiche locali non committate e ripristina uno stato pulito.
+
+
+###### Ripristino delle modifiche:
+```
+git stash pop  
+```
+
+Recupera l’ultimo stato salvato nello stash.
+
+![[Pasted image 20260317152032.png]]
+
+---
+
+## Merge
+Il merge è l’operazione che consente di integrare due branch.
+
+### Fast forward
+Si verifica quando il branch di destinazione non ha commit aggiuntivi rispetto a quello da integrare.
+In questo caso:
+- non viene creato un nuovo commit
+- il puntatore del branch viene semplicemente avanzato
+
+👉 storia lineare
+![[Pasted image 20260317152123.png]]
+
+### Merge commit
+Si verifica quando i due branch hanno evoluzioni divergenti.
+
+In questo caso:
+- Git crea un nuovo commit di merge
+- il commit ha due predecessori (uno per ciascun branch)
+
+![[Pasted image 20260317152219.png]]
+
+Qui entrambi i branch partono da `B`, ma evolvono in modo diverso.
+
+>[!tip] Conflitti
+I conflitti si verificano quando le stesse parti di uno o più file sono state modificate in entrambi i branch.
+>
+In questo caso:
+>- Git segnala il conflitto
+>- l’utente deve risolverlo manualmente
+>
+👉 Git lavora riga per riga  
+👉 con file binari spesso NON riesce → devi scegliere una versione
+
+
+---
+
+## Pull
+Il comando pull permette di aggiornare il repository locale con le modifiche presenti nel repository remoto.
+
+È composto da:
+- fetch → recupera gli aggiornamenti dal remoto
+- merge → integra gli aggiornamenti nel branch locale
+
+
+#### Caso senza modifiche locali (fast forward):
+- il branch locale viene aggiornato direttamente
+![[Pasted image 20260317152541.png]]
+
+#### Caso con modifiche locali:
+- viene eseguito un merge commit
+![[Pasted image 20260317152604.png]]
+
+## Rebase
+Il rebase è un’alternativa al merge.
+
+Consiste nel:
+- prendere i commit locali
+- applicarli sopra i commit più recenti del branch remoto
+
+Effetto:
+- storia lineare dei commit
+- eliminazione dei merge commit
+
+⚠️ Attenzione:
+- il rebase **riscrive la history** → può creare problemi se condiviso
+
+![[Pasted image 20260317152700.png]]
+
+---
+
+## .gitignore
+File che indica a Git quali file o cartelle ignorare.
+
+Serve per evitare di salvare:
+- file temporanei
+- file di build
+- file sensibili
+- cartelle come `node_modules/`
