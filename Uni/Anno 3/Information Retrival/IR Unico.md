@@ -756,3 +756,522 @@ Usando questa combinazione
 - le query possono essere eseguite circa **4 volte più velocemente**
 - ma l’indice occupa circa **26% di spazio in più**.
 
+
+---
+
+
+# Index Construction
+L’obiettivo della **costruzione dell’indice** è trasformare una collezione di documenti in una struttura dati che permetta di eseguire le query in modo **veloce ed efficiente**.
+
+Nei sistemi di **Information Retrieval** questa struttura dati è l’**inverted index**.
+
+Il processo di costruzione dell’indice consiste quindi nel:
+1. analizzare i documenti
+2. estrarre i termini
+3. costruire le **postings lists**
+4. organizzare i dati in modo efficiente per la ricerca -> ORDINARLI.
+
+Questo processo deve essere **molto scalabile**, perché i motori di ricerca devono indicizzare **collezioni enormi di documenti**.
+
+
+---
+
+# Dataset di esempio: Reuters RCV1
+Nelle slide viene usata come esempio la collezione **Reuters RCV1**.
+Si tratta di un dataset molto usato nella ricerca sull’Information Retrieval.
+
+
+Caratteristiche principali:
+
+| simbolo | significato                         | valore            |
+| ------- | ----------------------------------- | ----------------- |
+| N       | numero di documenti                 | circa **800.000** |
+| L       | numero medio di token per documento | circa **200**     |
+| M       | numero di termini distinti          | circa **400.000** |
+
+Da questi dati possiamo stimare il numero totale di **token** nella collezione:
+```
+T ≈ N × L
+```
+
+Quindi:
+```
+T ≈ 800000 × 200 = 160 milioni di token
+```
+
+Questo numero mostra chiaramente che la costruzione dell’indice deve gestire **quantità enormi di dati**.
+
+![[Pasted image 20260314125906.png]]
+
+## Token vs Term
+Nel processo di indicizzazione bisogna distinguere tra:
+### Token
+Un **token** è una parola che appare nel testo dei documenti.
+
+Esempio:
+```
+the
+caesar
+war
+```
+
+Un token può comparire **molte volte** nella collezione.
+
+### Term
+Un **term** è una parola **distinta** che appare nel dictionary dell’indice.
+Ogni termine compare **una sola volta nel dictionary**, anche se appare in molti documenti.
+
+Esempio:
+```
+dictionary:
+the
+caesar
+war
+```
+
+### Differenza di lunghezza media
+Nella slide sopra si osserva che:
+- i **token** hanno lunghezza media circa **4.5 byte**
+- i **termini distinti** hanno lunghezza media circa **7.5 byte**
+
+Questo succede perché i termini rari tendono ad essere **più lunghi**.
+
+Esempio:
+```
+token comuni:
+the
+is
+and
+```
+
+```
+termini rari:
+electroencephalography
+photosynthesis
+```
+
+
+---
+
+# Problema della costruzione dell’indice
+Ci sono due problemi fondamentali:
+1. **dimensione dei dati** 
+2. **limitazioni dell’hardware**
+
+Infatti la collezione può contenere **centinaia di milioni di token**.
+
+Questo significa che:
+- non sempre possiamo tenere tutti i dati **in memoria**
+- spesso dobbiamo usare **il disco**.
+
+
+---
+
+# Hardware Basics
+## 1. La memoria è molto più veloce del disco
+Accesso alla RAM:
+```
+≈ 10⁻⁹ secondi
+```
+
+Accesso al disco:
+```
+≈ millisecondi
+```
+
+La differenza può essere **milioni di volte**.
+
+## 2. Il problema principale del disco è il seek time
+Quando il disco deve leggere dati da una posizione diversa deve **spostare la testina**.
+
+Questo tempo di movimento si chiama:
+```
+seek time
+```
+
+Valore tipico:
+```
+≈ 5 ms
+```
+
+Questo è **molto più lento** rispetto alle operazioni della CPU.
+
+## 3. Accessi sequenziali sono molto più veloci
+Leggere dati **in sequenza** dal disco è molto più efficiente rispetto a fare molti accessi casuali.
+
+Quindi gli algoritmi di indicizzazione cercano di:
+- evitare accessi casuali
+- leggere grandi blocchi di dati.
+
+
+---
+
+# Uso della memoria durante la costruzione dell’indice
+Un algoritmo semplice di indicizzazione potrebbe essere:
+1. leggere tutti i documenti
+2. generare tutte le coppie `(term, docID)`
+3. ordinarle
+4. costruire le postings lists.
+
+Questo approccio funziona solo se **tutti i dati entrano in memoria**.
+
+Ma nelle collezioni reali questo **non è possibile**, e mettere tutto nel disco comporterebbe troppi sekk time.
+
+
+---
+
+# Using Disk
+Quando la collezione è troppo grande per la memoria principale, dobbiamo usare **algoritmi che sfruttano il disco**.
+
+L’idea generale è:
+1. processare **solo una parte dei dati alla volta** (in memoria)
+2. salvare i risultati intermedi su disco
+3. combinarli successivamente.
+
+Questo tipo di tecniche prende il nome di:
+```
+external memory algorithms
+```
+cioè algoritmi progettati per lavorare con dati più grandi della memoria disponibile.
+
+Questi algoritmi sono fondamentali per i motori di ricerca reali.
+
+## Algoritmi  
+
+### 1. Blocked Sort-Based Indexing (BSBI)
+L’idea è semplice:
+- dividere la collezione in **blocchi più piccoli** di dimensione fissa
+- processare **un blocco alla volta**
+- salvare i risultati intermedi su **disco**
+- infine **unire tutti i blocchi** per ottenere l’indice finale.
+
+#### PSEUDOCODICE
+![[Pasted image 20260314160243.png]]
+
+#### Come funziona BSBI
+Il processo avviene in **quattro fasi principali**:
+1. dividere i documenti in **blocchi di dimensione uguale**
+2. per ogni blocco generare le coppie `(termID, docID)`
+3. **ordinare** queste coppie in memoria
+4. salvare su disco un **indice invertito del blocco**
+
+Alla fine tutti i blocchi vengono **uniti (merge)** per creare l’indice finale.
+
+#### Creazione delle coppie (termID, docID)
+Durante il parsing dei documenti:
+- ogni termine viene convertito in un **termID**
+- ogni documento ha un **docID**
+
+Quindi il sistema genera coppie del tipo:
+```
+(termID, docID)
+```
+
+Esempio:
+```
+war → termID 15
+documento 23
+
+→ (15, 23)
+```
+
+Queste coppie vengono accumulate in memoria finché il blocco non è pieno.
+
+#### Ordinamento del blocco
+Quando il blocco è pieno:
+1. le coppie `(termID, docID)` vengono **ordinate**
+2. si costruisce l’**inverted index del blocco**
+3. il risultato viene scritto su **disco**
+
+L’inversione consiste nel trasformare:
+```
+(termID, docID)
+```
+
+in
+```
+termID → lista di docID
+```
+cioè la **posting list**.
+
+Ogni blocco produce quindi **un indice invertito parziale**.
+
+#### Merge dei blocchi
+Dopo aver processato tutti i blocchi, abbiamo diversi **indici parziali** salvati su disco.
+
+L’ultimo passo consiste nel **fonderli** in un unico indice.
+
+Il merge funziona così:
+1. si aprono **tutti i blocchi**
+2. si leggono le postings list
+3. si seleziona il **termID più piccolo**
+4. si uniscono le postings list dello stesso termine
+5. si scrive il risultato nell’indice finale.
+
+Per farlo possiamo usare una struttura dati efficiente, ad esempio:
+- **AVL tree**
+- **priority queue**
+
+Queste strutture permettono di trovare il prossimo termine con costo:
+```
+O(log n)
+```
+dove **n** è il numero di blocchi aperti.
+
+#### Merge delle postings lists
+Quando troviamo lo **stesso termine in più blocchi**, dobbiamo unire le loro postings lists.
+
+Questo è semplice perché:
+- le postings lists sono **già ordinate per docID**
+- i blocchi sono stati costruiti in modo **incrementale**
+
+Quindi per fare il merge basta:
+```
+concatenare le liste
+```
+
+Esempio:
+```
+blocco 1
+brutus → d1, d3
+
+blocco 2
+brutus → d6, d7
+```
+
+Risultato finale:
+```
+brutus → d1, d3, d6, d7
+```
+
+Non serve riordinare perché i docID del secondo blocco sono **maggiori di quelli del primo**.
+
+
+#### IMMAGINE EPLICATIVA
+![[Pasted image 20260314160329.png]]
+
+#### Complessità dell’algoritmo
+- Divido il mio insieme di documenti in `b` blocchi
+- Eseguo il merge per `b` volte su un blocco grande $\frac N b$ 
+
+Quindi$$b \cdot \frac N b \cdot log\left(\frac N b\right) = N \cdot log\left(\frac N b\right)$$
+#### Tempo reale di costruzione dell’indice
+Nella pratica il tempo di indicizzazione è dominato da:
+1. **parsing dei documenti**
+2. **merge finale dei blocchi**
+più che dall’ordinamento.
+
+
+### 2. Single-pass In-Memory Indexing (SPIMI)
+L’algoritmo **Blocked Sort-Based Indexing (BSBI)** scala bene, ma ha due problemi:
+1. richiede una struttura per **mappare i termini in termID**
+2. i blocchi sono di dimensione fissa, quindi potrebbe accadere che viene usato il 90% di memoria (perdendo un 10% importante)
+
+Per questo si usa un algoritmo più scalabile chiamato:
+```
+Single-pass in-memory indexing (SPIMI)
+```
+
+### PSEUDOCODICE
+![[Pasted image 20260314161152.png]]
+
+
+#### Idea principale di SPIMI
+La differenza principale rispetto a **BSBI** è che SPIMI:
+- usa **direttamente i termini**
+- non usa **termID**
+- non costruisce prima le coppie `(termID, docID)`
+
+Invece:
+- ogni termine viene **inserito subito nel dictionary**
+- la **postings list viene aggiornata immediatamente**
+
+#### Come funziona SPIMI
+L’algoritmo processa i documenti **token per token**.
+
+Per ogni token:
+1. si controlla se il termine è già nel **dictionary**
+	- se non esiste → viene creato 
+2. si crea una **postings list** (SE GIÀ NON È STATA CREATA)
+3. il **docID viene aggiunto alla postings list**
+
+Il dictionary è spesso implementato come:
+```
+hash table
+```
+per avere accesso veloce.
+
+#### Postings list dinamiche
+In SPIMI le postings list sono **dinamiche**.
+
+Quando una postings list si riempie:
+- viene allocata più memoria
+- tipicamente si **raddoppia lo spazio disponibile**
+
+Quindi:
+```
+dimensione nuova = 2 × dimensione precedente
+```
+
+Questo può sprecare un po’ di memoria, ma rende l’algoritmo **molto veloce**.
+
+>[!TIP] Differenza principale con BSBI
+Nel **BSBI**:
+>1. si generano tutte le coppie `(termID, docID)`
+>2. si ordinano
+>3. poi si costruiscono le postings list
+>
+>Nel **SPIMI** invece:
+>- le postings list vengono **costruite direttamente**
+   > 
+>- non serve il **sorting delle coppie** 
+>
+>Questo rende SPIMI:
+>
+>- **più veloce**
+   > 
+>- **più efficiente in memoria**
+
+#### Scrittura su disco
+Quando la memoria si esaurisce:
+1. il dictionary e le postings list del blocco vengono scritti su **disco**
+2. prima di scrivere, i **termini vengono ordinati**
+
+Questo serve perché:
+- i blocchi devono essere **ordinati lessicograficamente**
+- così il **merge finale** diventa semplice.
+
+#### Merge finale
+Come in **BSBI**, anche SPIMI produce **più blocchi su disco**.
+
+Alla fine:
+- i blocchi vengono **fusi (merge)**
+- si ottiene l’**inverted index finale**.
+
+#### Compressione
+SPIMI spesso utilizza anche **compressione** per:
+- le **postings lists**
+- il **dictionary**
+
+Questo permette di:
+- usare meno spazio su disco
+- processare **blocchi più grandi in memoria**.
+
+#### Complessità
+La complessità temporale di SPIMI è:
+```
+Θ(T)
+```
+
+dove:
+```
+T = numero totale di token
+```
+
+Questo perché:
+- non è necessario ordinare tutte le coppie `(termID, docID)`
+- le operazioni sono **lineari** rispetto alla dimensione della collezione.
+
+#### ESEMPIO VISIVO
+![[Pasted image 20260314161448.png]]
+
+
+---
+
+# Distributed Indexing
+Quando la collezione di documenti è **molto grande**, la costruzione dell’indice non può essere eseguita in modo efficiente su **una sola macchina**.
+
+Questo è particolarmente vero per il **Web**, dove i motori di ricerca devono indicizzare quantità enormi di documenti.
+
+Per questo motivo si usano sistemi di:
+```
+distributed indexing
+```
+cioè costruzione dell’indice **distribuita su più macchine**.
+
+
+# Cluster
+Il lavoro viene eseguito su un **cluster**.
+
+Un cluster è:
+```
+un gruppo di computer che lavorano insieme
+```
+
+Queste macchine sono chiamate **nodes**.
+
+I cluster permettono di risolvere problemi molto grandi utilizzando **molti computer economici** invece di un singolo supercomputer.
+
+
+# Distributed Index
+Il risultato della costruzione dell’indice è un **indice distribuito**, cioè un indice suddiviso tra più macchine.
+
+La suddivisione può avvenire in due modi:
+### Term-partitioned index
+Ogni macchina gestisce **un insieme di termini**.
+
+Esempio:
+```
+node 1 → termini A–F
+node 2 → termini G–M
+node 3 → termini N–Z
+```
+
+### Document-partitioned index
+Ogni macchina gestisce **un insieme di documenti**.
+
+Esempio:
+```
+node 1 → documenti 1–1M
+node 2 → documenti 1M–2M
+node 3 → documenti 2M–3M
+```
+I grandi motori di ricerca preferiscono **document partitioning**.
+
+
+# MapReduce
+Per costruire l’indice distribuito si usa spesso il modello:
+```
+MapReduce
+```
+
+MapReduce è un’architettura progettata per:
+```
+distributed computing
+```
+cioè per eseguire calcoli su **grandi cluster di macchine**.
+
+### Come funziona MapReduce
+Il lavoro viene diviso in **piccoli task** che possono essere eseguiti in parallelo.
+
+Il processo ha due fasi principali:
+### Map
+- i documenti vengono processati
+- si generano coppie
+```
+(term, docID)
+```
+### Reduce
+- le coppie con lo **stesso termine** vengono raggruppate
+- si costruiscono le **postings lists**
+
+### Master Node
+Nell'architettura MapReduce esiste un nodo speciale chiamato:
+```
+master node
+```
+
+Il master node ha il compito di:
+- dividere il lavoro in **task**
+- assegnare i task ai **worker nodes**
+- riassegnare il lavoro se una macchina fallisce.
+
+Questo è importante perché nei cluster con **centinaia o migliaia di macchine** alcuni nodi possono guastarsi.
+
+
+# Vantaggi del distributed indexing
+I vantaggi principali sono:
+- permette di indicizzare **collezioni enormi**
+- sfrutta **molte macchine in parallelo**
+- è **scalabile**
+- è **robusto ai guasti** (fault tolerance).
