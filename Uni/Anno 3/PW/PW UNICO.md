@@ -608,3 +608,276 @@ Serve per evitare di salvare:
 - file di build
 - file sensibili
 - cartelle come `node_modules/`
+
+
+
+---
+
+# CSS – Cascading Style Sheets
+## Cos’è il CSS
+Il CSS è uno **standard del W3C** usato per definire la **presentazione** dei documenti HTML (o XML).
+
+Serve a:
+- separare **contenuto (HTML)** da **stile (CSS)**
+- permettere **più rappresentazioni dello stesso documento**
+- garantire maggiore **coerenza tra browser**
+
+👉 Il browser combina HTML + CSS per generare la pagina finale.
+
+## Come funziona CSS
+- HTML → struttura
+- CSS → presentazione
+- Browser → unisce i due
+
+![Image](https://www.pcdazero.it/images/web01/VSC_10/codice-css.png)
+
+
+## Dove scrivere il CSS
+### 1. External Style Sheet
+- file `.css` esterno
+- collegato con `<link>` nell’`<head>`
+```html
+<link rel="stylesheet" href="style.css">
+```
+✔ soluzione migliore (riuso, pulizia)
+
+### 2. Internal Style Sheet
+- dentro `<style>` nell’`head`
+```html
+<style>
+  body { background: white; }
+</style>
+```
+✔ utile per pagine singole
+
+### 3. Inline
+- all'interno degli elementi con l’attributo `style`
+```html
+<h1 style="color:red;">Titolo</h1>
+```
+❌ da evitare (sporco, poco manutenibile)  
+✔ usato solo per override mirati
+
+
+## Elemento `<link>`
+Serve per collegare risorse esterne:
+- CSS
+- favicon
+```html
+<link rel="icon" href="icon.png">
+```
+
+## Struttura di una regola CSS
+```css
+h1 {
+  color: green;
+  font-size: 32px;
+}
+```
+- `h1` → selettore
+- `color: green;` → dichiarazione
+- `font-size: 32px`; -> dichiarazione
+- `color` / `font-size` → proprietà
+- `green` / `32px` → valore
+
+Il selettore dice al browser dove applicare quelle determinate regole.
+
+
+## Selettori CSS
+### 1. Selettore di elemento
+Seleziona tutti gli elementi di un tipo
+```css
+p { 
+	color: red; 
+}
+```
+
+### 2. Selettore di classe
+```css
+.verde { 
+	color: green; 
+}
+p.verde { 
+	color: green; 
+}
+```
+
+Nell'HTML
+```html
+<p>...</p> -> sarà rosso + 18px
+
+<p class="verde">...</p> -> sarà verde + 20px
+```
+✔ riutilizzabile su più elementi
+
+### 3. Selettore id
+```css
+#intro { 
+	color: blue; 
+}
+```
+
+Nell'HTML
+```html
+<p id="intro"></p>
+```
+✔ identifica **un solo elemento**
+
+
+### Confronto
+- elemento → generico
+- classe → medio
+- id → specifico
+
+## Selettori composti (relazioni DOM)
+![[Pasted image 20260319172628.png]]
+
+### Tipi principali
+- Discendenti
+```css
+A B
+```
+
+- Figli diretti
+```css
+A > B
+```
+
+- Fratello adiacente
+```css
+A + B
+```
+
+- Fratelli generici
+```css
+A ~ B
+```
+
+## Pseudo-classi
+Definiscono uno **stato** dell’elemento
+```css
+a:hover { 
+	color: red; 
+}
+
+input:focus { 
+	border: 2px solid blue; 
+}
+```
+
+✔ esempi:
+- `:hover`
+- `:focus`
+- `:visited`
+- `:nth-child()`
+
+## Pseudo-elementi
+Agiscono su **parti dell’elemento**
+```css
+p::first-letter { font-size: 2em; }
+```
+
+✔ esempi:
+- `::before`
+- `::after`
+- `::first-letter`
+
+## Selettori di attributo
+```css
+a[target="_blank"] { color: red; }
+img[alt] { background: grey; }
+```
+
+✔ utile quando non vuoi usare classi
+
+## Ereditarietà
+Alcune proprietà vengono ereditate dai figli.
+
+Esempio:
+- `color` → sì
+- `border` → no
+
+👉 non tutte le proprietà si propagano
+
+![[Pasted image 20260319172922.png]]
+>[!tip] SARÀ ROSSO
+>L'id ha QUASI sempre la differenza.
+
+
+## Conflitti tra regole
+Più regole possono colpire lo stesso elemento.
+
+Il browser decide:
+1. **specificità**
+2. **ordine** -> ULTIMA VINCE
+	![[Pasted image 20260319173000.png]]
+
+
+## IMPORTANTISSIMO - Cascade (Cascata)
+Algoritmo che combina gli stili da:
+- browser (default)
+- autore (tu)
+- utente (es. estensioni)
+
+👉 risolve i conflitti tra regole
+#### ORDINE
+![[Pasted image 20260319125634.png]]
+Se stai in basso hai la precedenza rispetto. a chi sta in alto
+Se il browser mette `!important` ha la precedenza assoluta MA SE IO USO L'INLINE LO INCULO.
+
+## !important
+```css
+color: red !important;
+```
+
+✔ forza una regola  
+❌ da evitare quasi sempre
+
+
+## Specificità
+Ogni selettore ha un peso:
+```
+[a, b, c, d]
+```
+- a → inline (1 o 0)
+- b → numero di id
+- c → classi / pseudo-classi / attributi
+- d → elementi
+
+👉 confronto da sinistra a destra
+
+### Regola base
+```
+id > classe > elemento
+```
+
+
+## Esempio
+```css
+p { 
+	color: green; 
+}
+
+.note { 
+	color: blue; 
+}
+
+#intro { 
+	color: red; 
+}
+```
+
+```html
+<p id="intro" class="note">Testo</p>
+```
+
+👉 risultato: **rosso** (vince id)
+
+
+## Nota importante (esame)
+Ricordati bene:
+- separazione HTML / CSS
+- tipi di selettori
+- specificità
+- cascade
+- differenza tra classe e id
