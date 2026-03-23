@@ -1570,48 +1570,380 @@ ordinamento per docID
 
 ---
 
+### Domande fatta sulla parte appena conclusa (che saranno utili per capire quella dopo)
+>[!question] Complessità di recupero di parole in un dizionario? 
+>Generalmente è logaritmico rispetto a un valore che non conosciamo a priori (la grandezza della dimensione dei documenti)
+
+>[!question] Mi conviene utilizzare un indice posizionale o biword? 
+>Noi preferiamo il posizionale
+>- lo svantaggio del biword è che da un lato rendo troppo sballata la statistica, dall'altro tipo creo dei falsi positivi (forse sono la stessa cosa non ho capito io)
+
+
+---
+
+
 # Index Compression
 Obiettivo:
 ```
-ridurre spazio (disco + RAM)
+ridurre lo spazio occupato dall’indice (RAM + disco)
 ```
 
-Tipi:
-### Lossless
-- nessuna perdita di informazione
-### Lossy
-- si perde qualcosa
+Perché è importante:
+- le **postings lists** sono la parte più grande dell’indice
+- il **dictionary** deve stare (quasi sempre) in memoria
+- meno dati → meno I/O → sistema più veloce
 
-## Idea base
-I docID sono grandi numeri → occupano molti bit
+👉 quindi la compressione non è solo spazio, ma anche **performance**
 
-Soluzione:
+---
+
+# Lossy vs Lossless Compression
+## Lossless
+Non perdi informazione.
+Puoi ricostruire esattamente i dati originali.
+
+Esempi:
+- compressione dictionary
+- compressione postings (gap, encoding)
+
+👉 è la **vera compressione**
+
+## Lossy
+Perdi informazione.
+Esempi:
+- stopword removal
+- stemming
+
+👉 qui non stai comprimendo  
+👉 stai **modificando ciò che indicizzi**
+
+#### Tabella vista a lezione
+![[Pasted image 20260320172028.png]]
+Leggila, fa vedere come a seconda di cosa scegliamo di fare 
+- rimuovere numeri
+- rimuovere `n` stopwords, 
+- fare lemmatizzazione
+Abbiamo un miglioramento di un tot di %.
+
+>[!tip]- Piccole spiegaizoni su alcuni punti
+>- Togliere le stopword in un NON POSITIONAL INDEX vuol dire togliere le righe più lunghe dalla matrice sparsa (credo valga anche per i positional index)
+>
+>- Fare stemming 
+>	- sul non positional index ti fa risparmiare il 4% perché `dog` e `dogs` le faccio collassare in un'unica parola
+>	- sul positional index non risparmio nulla perché `dog` e `dogs` le faccio collassare MA devo salvarmi comunque la posizione di entrambe
+
+
+La tabella è **lossy**:
+- cambia il contenuto dell’indice
+- non è più possibile tornare indietro
+
+---
+
+# Statistiche della collezione
+Prima di comprimere dobbiamo capire:
 ```
-memorizzare differenze (gap)
+come sono distribuiti i termini
+```
+
+Perché:
+- la compressione dipende dai dati
+	- termini
+	- docID
+	- postings
+	questi dati hanno proprietà particolari.
+
+
+# Heaps’ Law
+Descrive **come cresce il numero di parole distinte (vocabolario)** al crescere del numero totale di parole nella collezione.
+
+Formula:
+```
+M = kT^b
+```
+
+dove:
+- `M` = numero di termini distinti (vocabolario)
+- `T` = numero totale di token
+- `k` ≈ 30–100
+- `b` ≈ 0.5–1
+
+## Interpretazione
+Se aumentano i documenti:
+- i token crescono molto
+- il vocabolario cresce **più lentamente**
+
+👉 crescita **sublineare**
+
+#### Esempio su RCV1
+![[Pasted image 20260320173318.png]]
+- asse x → `log10 T` → numero di token
+- asse y → `log10 M` → dimensione vocabolario
+```
+stai guardando come cresce il vocabolario al crescere dei token
+```
+
+👉 questo grafico mostra che:
+```
+il numero di termini distinti cresce con i token, ma in modo sublineare
+```
+
+## Perché è importante
+- il dictionary cresce lentamente → bene per la memoria
+- ma non smette mai di crescere
+
+👉 quindi serve comunque comprimere
+
+
+# Zipf’s Law
+Descrive **come sono distribuite le frequenze delle parole** in una collezione.
+
+Se ordini i termini per frequenza:
+```
+frequenza ∝ 1 / rank
+```
+
+Significa:
+- il termine più frequente compare tantissimo
+- il secondo circa la metà
+- il terzo ancora meno
+- ecc…
+
+## Conseguenze
+- poche parole → frequenza altissima
+- tantissime parole → frequenza bassissima
+
+👉 distribuzione molto sbilanciata
+
+## Impatto sull’indice
+- alcune postings list sono **lunghissime**
+- molte sono **piccolissime**
+
+👉 la compressione deve funzionare bene su numeri piccoli  
+(perché i gap saranno piccoli)
+
+
+---
+
+# Compressione del Dictionary
+La ricerca inizia dal dizionario, e noi vogliamo tenerlo in memoria.
+
+Il dictionary contiene:
+- termini (stringhe)
+- puntatori alle postings
+
+Problema:
+- le stringhe occupano spazio
+- i puntatori occupano spazio
+
+
+## Approccio pigro -> senza ottimizzazione
+![[Pasted image 20260320172550.png]]
+Completamente inutile perché sprechiamo troppo spazio
+- anche per una lettera tipo `a` noi allochiamo 20 bytes di spazio
+
+
+## Soluzione 1: Dictionary as a String
+Invece di salvare ogni termine separato:
+```
+[term1][term2][term3]
+```
+
+salvo:
+```
+un’unica stringa lunga
+```
+
+e per ogni termine memorizzo:
+- un puntatore (offset)
+
+![[Pasted image 20260320172608.png]]
+
+>[!question] Vedi come si calcola 22 byte. 
+
+### Vantaggio
+- elimino overhead delle singole stringhe
+- struttura più compatta
+
+### Spazio
+![[Pasted image 20260320172630.png]]
+
+
+## Soluzione 2: Blocking
+Idea:
+- non salvo un puntatore per ogni termine
+- ma uno ogni `k` termini
+- di fianco a ogni termine scrivo la sua lunghezza
+
+Esempio:
+```
+k = 4
+```
+→ un puntatore ogni 4 parole
+
+![[Pasted image 20260320172728.png]]
+
+
+### Come funziona
+Per cercare un termine:
+1. salto al blocco giusto
+2. cerco sequenzialmente dentro il blocco
+
+### Trade-off
+- meno puntatori → meno spazio
+- ma:
+    - ricerca leggermente più lenta 
+
+![[Pasted image 20260320180208.png]]
+
+👉 Per questo è meglio avere un `k` non troppo alto, altrimenti
+- lo spazio occupato sarebbe minimo
+- ma il tempo impiegato nella ricerca sarebbe lineare
+
+
+### Differenza di ricerca
+##### SENZA BLOCKING
+![[Pasted image 20260320180512.png]]
+##### CON BLOCKING
+![[Pasted image 20260320180452.png]]
+
+
+
+## Soluzione 3: Front Coding
+Sfrutta il fatto che:
+```
+i termini sono ordinati lessicograficamente
+```
+E quindi spesso condividono prefissi.
+
+### Esempio
+![[Pasted image 20260320172827.png]]
+### Vantaggio
+- non ripeto il prefisso
+- riduco molto lo spazio
+
+
+
+>[!tip]- Riassunto visivo sullo spazio occupato in MB delle varie tecniche
+>![[Pasted image 20260320180552.png]]
+
+
+---
+
+# Compressione delle Postings
+Le postings list contengono:
+```
+liste di docID
+```
+e sono molto di più grandi dei dizionari.
+
+
+Problema:
+- numeri grandi → tanti bit
+![[Pasted image 20260320180831.png]]
+
+
+## Gap Encoding
+Invece di salvare i docID:
+```
+173, 174, 180
+```
+
+salvo:
+```
+173, 1, 6
+```
+
+## Perché funziona
+- le liste sono ordinate
+- quindi le differenze sono piccole
+
+👉 numeri piccoli → meno bit
+
+
+---
+
+# Variable Length Encoding
+Dopo il Gap Encoding abbiamo tanti numeri piccoli, e se usassimo 32 bit per ogni numero sprecheremmo spazio.
+
+Obiettivo:
+```
+usare meno bit per numeri piccoli
+```
+
+
+Problema:
+```
+se uso lunghezza variabile → non so dove finisce un numero
+```
+
+Serve un encoding che:
+- sia compatto
+- sia decodificabile
+
+
+# Unary Code
+Codifica un numero `n` come:
+```
+n volte 1 + 0 finale
 ```
 
 Esempio:
 ```
-173, 174
+3 → 1110
 ```
 
-diventa:
+## Pro e contro
+✔ semplice  
+❌ inefficiente per numeri grandi
+
+👉 utile solo quando i numeri sono molto piccoli
+
+
+# Gamma Code
+Idea:
+- non codifico direttamente il numero
+- codifico:
+    1. la lunghezza
+    2. il valore
+
+## Struttura
 ```
-173, +1
+unary(lunghezza) + parte binaria
 ```
 
-Questo usa meno spazio.
+## 🔸 Passaggi (fondamentale)
+Prendiamo 13:
+#### 1. scrivo in binario
+- 13 → 1101
+#### 2. prendo la lunghezza
+- lunghezza = 4
+#### 3. codifico la lunghezza in unary (MA -1)
+- lunghezza - 1 = 3
+	3 → 1110
+#### 4. tolgo il primo bit del numero
+- 1101 → 101
+#### 5. unisco
+- 1110 + 101 = 1110101
+👉 questo è il gamma code di 13
 
-## Perché funziona
-Perché le postings list sono:
-```
-ordinate
-```
 
-Quindi le differenze sono piccole → meno bit → più compressione
+>[!tip]- Esempi di numeri codificati
+>![[Pasted image 20260320181714.png]]
 
-## Nota importante
-Compressione è utile perché:
-- meno spazio su disco
-- meno dati da leggere → più veloce
+
+## Perché è migliore
+- numeri piccoli → pochissimi bit
+- più efficiente dell'unario classico
+
+## Problema
+- più complesso
+- più lento da decodificare
+
+👉 quindi:
+- teoricamente ottimo
+- nella pratica spesso sostituito da encoding più veloci
+
+
+### Proprietà del Gamma code
+![[Pasted image 20260320182003.png]]
 
