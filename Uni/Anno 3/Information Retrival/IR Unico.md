@@ -2173,6 +2173,11 @@ Un **k-gram** è una sequenza di $k$ caratteri.
 
 ## Spelling Correction
 Qui viene analizzato il modo in cui vengono corretti errori di battitura.
+
+>[!quote] Lucata
+>Quando vuoi scrivere "query" ma sbagli e scrivi "porcoddio".
+
+
 La correzione può essere 
 - **Isolated-term** (corregge il singolo termine senza guardare il contesto) 
 - **Context-sensitive** (usa le parole circostanti).
