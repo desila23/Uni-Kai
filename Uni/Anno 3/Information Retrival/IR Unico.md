@@ -1947,3 +1947,279 @@ Prendiamo 13:
 ### Proprietà del Gamma code
 ![[Pasted image 20260320182003.png]]
 
+
+---
+
+# VARIABLE BYTE ENCODING (VB)
+## Problema
+Dopo il **gap encoding**, le postings list diventano:
+- sequenze di **interi piccoli**
+- ma se li salvo con 32 bit → **spreco spazio**
+
+👉 serve una rappresentazione:
+- compatta
+- decodificabile velocemente
+
+## Idea
+Usare un numero **variabile di byte** per rappresentare un intero.
+- numeri piccoli → pochi byte
+- numeri grandi → più byte
+
+## Struttura
+Ogni byte ha 8 bit:
+- **1 bit di controllo (continuation bit)**
+- **7 bit di informazione**
+
+Schema:
+```
+[c | xxxxxxx]
+```
+- c = 1 → ultimo byte del numero
+- c = 0 → il numero continua nel byte successivo
+
+## Codifica
+Dato un numero `n`:
+1. si rappresenta in base 128
+2. si divide in gruppi di 7 bit
+3. si costruiscono i byte:
+    - tutti con c = 0
+    - tranne l’ultimo con c = 1
+
+## Esempi
+### Numero piccolo: 5
+- 5 < 128 → basta 1 byte
+```
+10000101
+```
+
+### Numero: 130
+- 130 = 1 * 128 + 2
+→ due blocchi:
+- 0000001
+- 0000010
+
+→ encoding:
+```
+00000001   (c = 0)
+10000010   (c = 1)
+```
+
+## Decodifica
+Si leggono i byte in sequenza:
+1. si prendono i 7 bit utili
+2. si concatenano
+3. si continua finché:
+    - c = 0 → continua
+    - c = 1 → fine numero
+
+## Proprietà
+- **self-delimiting** → non serve separatore
+- **byte-aligned** → veloce da leggere
+- **semplice da implementare**
+
+## Efficienza
+Funziona bene perché:
+- dopo gap encoding → molti numeri piccoli
+- quindi:
+    - spesso 1 byte
+    - raramente più byte
+
+👉 buona compressione + alta velocità
+
+## Limiti
+- non è ottimale in termini di bit
+- spreca spazio -> usa byte interi anche per numeri piccoli
+
+👉 esistono metodi migliori:
+- γ encoding
+- δ encoding
+
+## Collegamento con teoria IR
+VB funziona perché:
+- le postings sono ordinate
+- i gap sono piccoli
+- la distribuzione segue Zipf
+
+👉 molti numeri piccoli → compressione efficace
+
+
+### RCV1 compression
+![[Pasted image 20260325101101.png]]
+
+
+---
+
+# SIMPLE-9 (Anh & Moffat, 2004)
+
+## Problema
+Con **Variable Byte**:
+- semplice
+- veloce  
+    ❌ ma non usa bene i bit
+
+👉 spreca spazio perché lavora a **byte (8 bit)**
+
+## Idea di Simple-9
+Usare **word da 32 bit** invece di byte.
+
+👉 in 32 bit voglio mettere:
+- **più numeri possibile**
+- scegliendo come comprimerli
+
+## Struttura generale
+Ogni blocco = **32 bit (4 byte)**
+
+Diviso in:
+```id="e4qk2o"
+[ 4 bit | 28 bit ]
+```
+- **4 bit → selector (layout)**
+- **28 bit → dati compressi**
+
+## Concetto chiave (fondamentale)
+👉 non salvo un numero per volta  
+👉 salvo **più numeri nello stesso blocco**
+
+Come?
+- se numeri piccoli → ne metto tanti
+- se numeri grandi → ne metto pochi
+
+👉 il selector dice **come interpretarli**
+
+# 5. Layout 
+I 4 bit iniziali scelgono il formato:
+
+|Selector|Significato|
+|---|---|
+|0|1 numero da 28 bit|
+|1|2 numeri da 14 bit|
+|2|3 numeri da 9 bit|
+|3|4 numeri da 7 bit|
+|4|5 numeri da 5 bit|
+|5|7 numeri da 4 bit|
+|6|9 numeri da 3 bit|
+|7|14 numeri da 2 bit|
+|8|28 numeri da 1 bit|
+
+👉 sempre:
+```id="m6n2rj"
+n * b ≤ 28
+```
+
+# Esempio intuitivo
+Hai questi gap:
+```id="x3bq7k"
+1, 2, 1, 1, 3, 2, 1
+```
+👉 numeri piccoli → bastano 3 bit
+→ uso selector = 6
+✔ metto **9 numeri da 3 bit** in un solo blocco
+
+Altro caso:
+```id="q9y4zt"
+100000
+```
+👉 numero grande → serve più spazio
+→ selector = 0
+✔ uso tutto il blocco per 1 numero
+
+# Come funziona (processo)
+### Encoding
+1. prendi i gap
+2. guarda quanti ne puoi mettere in 28 bit
+3. scegli il **layout migliore**
+4. scrivi:
+    - selector (4 bit)
+    - numeri compressi
+
+### Decoding
+1. leggi i primi 4 bit
+2. capisci il formato
+3. dividi i 28 bit
+4. ricostruisci i numeri
+
+
+---
+
+
+
+# Dictionaries and Tolerant Retrieval
+Il compito principale in questa fase è il **vocabulary lookup**: determinare se un termine di una query esiste nel vocabolario e identificare il puntatore alle relative *postings lists*.
+
+
+## Wildcard Queries (Query con Caratteri Jolly)
+Le query con carattere `*` (che indica una stringa di lunghezza ≥ 0) si dividono in diverse tipologie di complessità crescente:
+
+### Trailing e Leading Wildcards
+* **Trailing (es. `mon*`):** Facilmente gestibili con un B-tree standard cercando tutti i termini nell'intervallo lessicografico.
+* **Leading (es. `*mon`):** Richiedono un **Reverse B-tree**, ovvero un albero in cui i termini del dizionario sono memorizzati al contrario (es. `lemon` → `nomel`).
+* **Infix (es. `se*mon`):** Si risolvono intersecando i risultati di un B-tree (per `se*`) e di un Reverse B-tree (per `*mon`). Tuttavia, l'operazione è costosa.
+
+### Permuterm Index
+Per gestire query generiche (es. `m*n*o`), si introduce il **Permuterm Index**. 
+1.  Si aggiunge un simbolo speciale `$` alla fine del termine (es. `hello$`).
+2.  Si memorizzano tutte le **rotazioni** del termine: `hello$`, `ello$h`, `llo$he`, `lo$hel`, `o$hell`, `$hello`.
+3.  **Processamento:** La query viene ruotata in modo che il `*` appaia quasi sempre alla fine.![[Pasted image 20260325103629.png]]
+>[!problem] *Svantaggio:* La dimensione del dizionario esplode (empiricamente quadruplica).
+
+### k-gram Index
+Più efficiente in termini di spazio rispetto al permuterm. 
+Un **k-gram** è una sequenza di $k$ caratteri.
+*   Si costruisce un indice invertito dove le "chiavi" sono i k-grammi e le "postings" sono i termini del vocabolario che li contengono.
+*   **Esempio (bigrammi per `castle`):** `$c, ca, as, st, tl, le, e$`.
+*   **Processamento:** Una query `re*ve` viene scomposta in `$r, re` AND `ve, e$`.
+*   **Post-filtering:** Poiché l'AND dei k-grammi può restituire falsi positivi (es. `red*` potrebbe restituire `retired` perché contiene i k-grammi richiesti ma non è un match testuale), è necessario un passaggio di verifica booleana sul set di candidati.
+
+
+## Spelling Correction
+Qui viene analizzato il modo in cui vengono corretti errori di battitura.
+La correzione può essere 
+- **Isolated-term** (corregge il singolo termine senza guardare il contesto) 
+- **Context-sensitive** (usa le parole circostanti).
+
+### Non-word ERROR
+Quando viene digitata una parola che non esiste.
+Generalmente questo errore si verifica quando la parola scritta non appartiene al nostro dizionario.
+Per correggerla
+- generiamo dei candidati -> parole reali che sono simile a quella scritta per errore
+	- il candidato migliore è quello che
+		- ha il peso minore rispetto all'edit distance -> ossia richiede il minor numero di cambiamenti
+		- ha la probabilità più alta di *noisy channel*
+
+>[!tip] GENERALMENTE l'80% degli errori sono a edit distance 1, AL PIÙ 2.
+
+#### Testing dei candidati: edit distance
+Gli edit generalmente sono
+- Inserzione 
+- Cancellazione
+- Sostituzione 
+- Trasposizione di due lettere adiacenti
+![[Pasted image 20260325105509.png]]
+
+
+### Noisy Channel Model (Modello del Canale Rumoroso)
+È l'approccio probabilistico standard basato sulla **Regola di Bayes**. 
+Data una parola osservata $x$ (potenzialmente errata), vogliamo trovare la parola corretta $\hat{w}$ che massimizza:
+$$\hat{w} = \text{argmax}_{w \in V} P(w|x) = \text{argmax}_{w \in V} P(x|w)P(w)$$
+
+Dove:
+*   **$P(w)$ (Language Model):** La probabilità a priori della parola nel linguaggio (quanto è comune $w$ nel corpus). 
+	* Si calcola tramite conteggi di unigrammi: $P(w) = \frac{C(w)}{T}$.
+		* $C(w)$ -> quante volte appare `w` nel documento
+		* $T$ -> numero totale di tokens
+		![[Pasted image 20260325105527.png]]
+*   **$P(x|w)$ (Error Model / Likelihood):** La probabilità che scrivendo $w$ l'utente digiti $x$. 
+	* Si basa su una **Confusion Matrix** (es. probabilità di scambiare 'a' con 's' perché vicine sulla tastiera).
+
+### Error model $P(x|w)$
+Possiamo usare delle matrici 	![[Pasted image 20260325105611.png]]
+
+E su queste matrici fare dei calcoli
+![[Pasted image 20260325105838.png]]
+
+#### Smoothing
+Per evitare divisioni per 0, aggiungiamo `1` a tutti i conteggi nella matrice e se abbiamo un alfabeto lungo `|A|`, normalizziamo correttamente.
+![[Pasted image 20260325110008.png]]
+
+![[Pasted image 20260325110017.png]]
+
