@@ -874,10 +874,242 @@ p {
 👉 risultato: **rosso** (vince id)
 
 
-## Nota importante (esame)
-Ricordati bene:
-- separazione HTML / CSS
-- tipi di selettori
-- specificità
-- cascade
-- differenza tra classe e id
+---
+
+# FONT (CSS)
+
+## Tipi di font
+I font si dividono in:
+### Font specifici
+- hanno un nome preciso  
+    → es: `Arial`, `Times New Roman`
+- funzionano **solo se installati nel sistema**
+
+### Font generici
+- famiglie standard  
+    → `serif`, `sans-serif`, `monospace`, `cursive`, `fantasy`
+- usati come **fallback**
+
+---
+
+## Famiglie di font
+I font vengono raggruppati in famiglie:
+- `serif`
+- `sans-serif`
+- `monospace`
+- `cursive`
+- `fantasy`
+
+👉 `monospace`  
+tutti i caratteri hanno **stessa larghezza**
+
+---
+
+## Dipendenza dal sistema
+I font:
+- dipendono dal **sistema operativo**
+- funzionano solo se installati
+
+👉 browser diversi → risultati diversi
+
+---
+
+## Font stack (IMPORTANTISSIMO)
+Si usa una lista di font in ordine.
+
+Il browser:
+- prova il primo
+- se non c’è → passa al successivo
+
+Alla fine:
+- sempre una **famiglia generica**
+```css
+body {  
+    font-family: Arial, Helvetica, sans-serif;  
+}
+```
+
+---
+
+## Importare font
+### 1. Locali
+- presenti nel progetto
+
+### 2. Esterni
+- es: Google Fonts
+
+### 3. `@font-face`
+Permette di caricare font personalizzati
+```css
+@font-face {  
+    font-family: 'Roboto';  
+    src: url('Roboto-Light-webfont.woff') format('woff');    
+}
+```
+👉 formato più usato: `.woff`
+
+Dopo:
+```css
+body {
+    font-family: 'Roboto', sans-serif;
+}
+```
+
+---
+
+## Font size
+Specifica la dimensione del testo
+
+### Valori relativi
+- `%` → rispetto al genitore
+- `em` → multiplo del font corrente  
+    ✔ più flessibili
+
+### Valori assoluti
+- `px` → dimensione fissa  
+    ❌ meno adattabile
+
+---
+
+## Font weight e style
+### font-weight
+- spessore del testo
+- valori:
+    - `normal`
+    - `bold`
+    - numerici (100–900)
+
+### font-style
+- stile del testo
+- valori:
+    - `normal`
+    - `italic`
+
+---
+
+## Shorthand `font`
+Permette di scrivere tutto in una riga
+
+👉 ordine:
+- style
+- weight
+- size / line-height
+- family
+
+```css
+p {  
+    font: italic bold 16px/1.5 Arial, sans-serif;  
+}
+```
+
+---
+
+# TESTO E COLORI
+## Colore testo
+```css
+color: red;
+```
+👉 proprietà **ereditata**
+
+### Formati colore
+- nome
+    ```css
+    color: red;
+    ```
+- esadecimale
+    ```css
+    color: #336699;
+    ```
+- rgb
+    ```css
+    color: rgb(51, 102, 153);
+    ```
+- rgba (con trasparenza)
+    ```css
+    color: rgba(51, 102, 153, 0.5);
+    ```
+
+---
+
+## text-align
+Allineamento orizzontale
+
+Valori:
+- `left`
+- `right`
+- `center`
+- `justify`
+
+```css
+p {  
+    text-align: center;  
+}
+```
+
+---
+
+## text-decoration
+Decorazioni del testo
+
+Valori:
+- `none`
+- `underline`
+- `overline`
+- `line-through`
+
+```css
+a {  
+    text-decoration: none;  
+}
+```
+
+---
+
+## text-transform
+Modifica maiuscole/minuscole
+
+Valori:
+- `uppercase`
+- `lowercase`
+- `capitalize`
+
+```css
+h1 {  
+    text-transform: uppercase;  
+}
+```
+
+---
+
+## text-indent
+Indentazione prima riga
+
+Valori:
+- `px`
+- `em`
+- `%`
+
+```css
+p {  
+    text-indent: 2em;  
+}
+```
+
+---
+
+## text-shadow
+Aggiunge ombra al testo
+👉 parametri:
+- offset-x
+- offset-y
+- blur
+- colore
+
+```css
+h1 {  
+    text-shadow: 2px 2px 5px gray;  
+}
+```
+
+
+---
