@@ -2228,3 +2228,135 @@ Per evitare divisioni per 0, aggiungiamo `1` a tutti i conteggi nella matrice e 
 
 ![[Pasted image 20260325110017.png]]
 
+
+## Correzione Ortografica Context-Sensitive
+Fino ad ora abbiamo trattato la correzione di **non-word errors** (parole che non esistono nel dizionario). Tuttavia, circa il **25-40% degli errori di spelling** consiste in parole reali utilizzate nel contesto sbagliato (*real-word errors*).
+
+### Il Problema dei Real-Word Errors
+Si verificano quando l'utente digita una parola esistente nel dizionario, ma diversa da quella intesa.
+*   **Necessità del contesto:** Per rilevare e correggere questi errori, non basta consultare il dizionario; è indispensabile analizzare le parole circostanti tramite un **Language Model**.
+
+
+## Il Modello del Canale Rumoroso (Noisy Channel)
+Per la correzione basata sul contesto, estendiamo il modello probabilistico di Bayes applicandolo all'intera frase. 
+Data una sequenza di parole osservate $X = (x_1, x_2, ..., x_n)$, vogliamo trovare la sequenza di parole intese $W = (w_1, w_2, ..., w_n)$ che massimizza la probabilità a posteriori:
+$$\hat{W} = \text{argmax}_{W \in V} P(W|X) = \text{argmax}_{W \in V} P(X|W)P(W)$$
+
+### 1. Generazione dei Candidati
+Per ogni parola $x_i$ della frase, generiamo un set di candidati $Candidate(x_i)$ che include:
+*   La parola stessa ($x_i$).
+*   Tutte le parole nel dizionario a **edit distance 1** (o 2).
+*   Eventuali omofoni (parole con pronuncia simile).
+
+### 2. Language Model: Incorporare il Contesto
+Il termine $P(W)$ rappresenta la probabilità della sequenza di parole. Per calcolarla in modo efficiente senza "esplodere" computazionalmente, si utilizza un **modello a bigrammi** (Catena di Markov):
+$$P(w_1, ..., w_n) = P(w_1)P(w_2|w_1)P(w_3|w_2)...P(w_n|w_{n-1})$$
+- $P(w_{i}|w_{i-1})$ -> probabilità che IN GENERALE la parola $w_{i}$ venga scritta dopo la parola $w_{i-1}$ 
+
+ESEMPIO
+![[Pasted image 20260329170616.png]]
+
+#### Smoothing per Interpolazione
+In molti casi, una coppia di parole (bigramma) potrebbe non essere presente nel corpus di addestramento, portando la probabilità a zero. Si risolve interpolando la probabilità del bigramma con quella dell'unigramma:
+$$P_{li}(w_k|w_{k-1}) = \lambda P_{uni}(w_k) + (1-\lambda)P_{bi}(w_k|w_{k-1})$$
+* **$\lambda$ (Peso):** Determina quanto "fidarsi" della parola singola rispetto alla coppia.
+* **Log-Probabilities:** Per evitare il *floating point underflow* (numeri troppo piccoli derivanti da molte moltiplicazioni), si lavora nel dominio dei logaritmi, trasformando i prodotti in somme: $$\log P(w_1...w_n) = \log P(w_1) + \sum \log P(w_i|w_{i-1})$$
+### 3. Channel Model: Probabilità di Errore
+Il termine $P(X|W)$ stima la probabilità che la parola $w$ venga digitata come $x$. 
+* Se l'errore è una *non-word*, si usano le matrici di confusione già viste.
+* **Novità per Real-Words:** Dobbiamo definire la probabilità che una parola sia stata scritta correttamente (**No Error**), ovvero $P(w|w)$.
+    * Questa probabilità varia in base all'applicazione (es. 0.90 per testi informali, 0.99 per testi curati).
+
+
+## Strategie di Semplificazione e Ottimizzazione
+Calcolare la combinazione migliore tra tutti i candidati di ogni parola della frase è complesso.
+
+Per rendere il sistema trattabile, si adottano spesso delle semplificazioni:
+1. **Assunzione dell'Errore Singolo:** Si assume che in ogni frase ci sia **al massimo un errore** di spelling. Si generano quindi diverse varianti della frase originale modificando una sola parola alla volta e si sceglie la sequenza $W$ con $P(W)$ maggiore.
+2. **Peso del Prior ($\lambda$):** Si introduce un parametro di peso $\lambda$ per bilanciare il peso del modello linguistico rispetto al modello di errore:$$\hat{w} = \text{argmax}_{w \in V} P(x|w)P(w)^\lambda$$
+
+## Hidden Markov Model (HMM) - Concetti Base
+Il problema della correzione può essere visto come un HMM dove:
+*   **Osservazioni:** Le parole scritte dall'utente (ciò che vediamo).
+*   **Stati Hidden:** Le parole effettivamente intese (ciò che vogliamo scoprire).
+*   **Probabilità di Transizione:** La probabilità che una parola segua l'altra (Bigramma).
+*   **Probabilità di Osservazione:** La probabilità che lo stato "nascosto" $w$ produca l'output $x$ (Channel Model).
+
+![[Pasted image 20260329170701.png]]
+
+## Ulteriori Miglioramenti
+Queste sono migliorie estreme
+* **Edits Ricchi:** Considerare errori più complessi della singola lettera (es. *ent* $\to$ *ant*, *ph* $\to$ *f*).
+* **Pronuncia:** Integrare modelli fonetici per pesare maggiormente candidati che suonano simili all'errore.
+* **Device-Specific:** Adattare il channel model al dispositivo (es. gli errori su una tastiera Android sono diversi da quelli su PC a causa della vicinanza dei tasti).
+
+
+---
+
+# Scoring, Term Weighting e il Modello Spaziale
+
+### 1. Limiti del Recupero Booleano (Ranked Retrieval)
+Il sistema booleano classico presenta diverse criticità per l'utente comune:
+* **Feast or Famine:** Le query booleane tendono a restituire o troppi risultati (difficili da esaminare) o zero risultati (se troppo specifiche).
+* **Assenza di Sfumature:** Un documento o soddisfa la query (match) o non la soddisfa. Non esiste una scala di rilevanza.
+
+***Soluzione:*** Implementare il **Ranked Retrieval**, ordinando i documenti in base a un punteggio di "bontà" (*score*) rispetto alla query, agendo come un "soft AND".
+
+### 2. Il Punteggio di Matching (Scoring)
+Per ordinare i documenti, assegniamo un punteggio in un intervallo $[0, 1]$ a ogni coppia query-documento. Le premesse fondamentali sono:
+1.  Se nessun termine della query appare nel documento, lo score è 0.
+2.  Più un termine della query è frequente nel documento, maggiore deve essere lo score.
+3.  Più termini della query compaiono nel documento, maggiore deve essere lo score.
+
+### 3. Il Coefficiente di Jaccard
+Un metodo statistico comune per misurare la sovrapposizione tra due insiemi (query $A$ e documento $B$):
+$$\text{JACCARD}(A, B) = \frac{|A \cap B|}{|A \cup B|}$$
+*   **Proprietà:** Restituisce 1 se gli insiemi sono identici, 0 se sono disgiunti.
+*   **Limiti per l'IR:**
+    *   Non considera la **Term Frequency** (quante volte un termine appare).
+    *   Non considera l'informatività dei termini rari (tratta tutte le parole allo stesso modo).
+    *   La normalizzazione della lunghezza non è ottimale (il coseno è generalmente preferito).
+
+>[!tip]- Il limite enorme 
+>Se nel documento la parola "Virus" appare 100 volte, Jaccard la conta come **una sola volta**. Non gli importa se ne parli tanto o poco, gli importa solo che la parola "esista" nel set. Inoltre, tratta la parola "il" (comunissima) con la stessa importanza della parola "Criptovaluta" (rara e specifica).
+
+### 4. Rappresentazione dei Documenti
+* **Binary Incidence Matrix:** Rappresenta i documenti come vettori binari $\{0, 1\}^{|V|}$. Indica solo la presenza/assenza del termine.
+* **Count Matrix:** Rappresenta i documenti come vettori di conteggi in $\mathbb{N}^{|V|}$.
+* **Bag of Words Model:** Questo modello ignora l'ordine delle parole. "John è più veloce di Mary" e "Mary è più veloce di John" hanno la stessa rappresentazione. Nonostante la perdita di informazione, è una semplificazione efficace per il ranking.
+
+### 5. Term Frequency (tf)
+La frequenza grezza (*raw tf*) non è ideale perché la rilevanza non aumenta proporzionalmente alla frequenza (un documento con 10 occorrenze non è 10 volte più rilevante di uno con 1 sola).
+
+* **Log-frequency Weighting:** Si applica una trasformazione logaritmica per "smorzare" (*dampen*) l'effetto:$$w_{t,d} = \begin{cases} 1 + \log_{10} \text{tf}_{t,d} & \text{se } \text{tf}_{t,d} > 0 \\ 0 & \text{altrimenti} \end{cases}$$
+	* metto `1 + log` perché se la `tf` è $1$ il `log` restituisce 0.
+
+* **Score query-documento (tf-matching):** Somma dei pesi logaritmici per tutti i termini $t$ presenti sia nella query $q$ che nel documento $d$:$$\text{score}(q, d) = \sum_{t \in q \cap d} (1 + \log \text{tf}_{t,d})$$
+>[!tip] Il trucco del Logaritmo 
+>Usiamo il logaritmo per "schiacciare" i numeri grandi. Il logaritmo trasforma i grandi incrementi in piccoli passi. In questo modo, un documento con tantissime occorrenze avrà un punteggio più alto, ma non distruggerà gli altri documenti nel ranking solo perché è più lungo o ripetitivo.
+
+### 6. Inverse Document Frequency (idf)
+Non tutti i termini hanno lo stesso potere discriminante. I termini rari sono più informativi dei termini frequenti (es. *Feniletilamina* vs *andare*).
+* **Document Frequency ($\text{df}_t$):** Numero di documenti nella collezione che contengono il termine $t$.
+* **Peso idf:** Misura l'informatività di un termine.$$\text{idf}_t = \log_{10} \frac{N}{\text{df}_t}$$
+    dove $N$ è il numero totale di documenti nella collezione.
+* **Effetto sul ranking:** L'idf influenza il ranking solo per query con almeno due termini (es. in "arachnocentric line", aumenta il peso del termine raro e diminuisce quello del termine comune).
+
+>[!example]- Spiegazione e esempio
+>**L'idea:** Più una parola è diffusa in **tutta la collezione** di documenti, meno è utile per distinguere un documento dall'altro.
+>
+>**Esempio:** 
+>- La parola "il" appare in 1.000.000 di documenti su 1.000.000. Il suo $idf$ sarà $\log(1/1) = 0$. Peso zero.
+>- La parola "Pitagora" appare in 100 documenti su 1.000.000. Il suo $idf$ sarà molto alto.
+>
+>**In sintesi:** L'idf è un "filtro" che abbassa il volume alle parole comuni e alza il volume alle parole rare e specifiche.
+
+
+>[!tip]- Nota su cf vs df 
+>La **Collection Frequency** ($\text{cf}_t$) conta il numero totale di token del termine nella collezione. 
+>La $\text{df}_t$ è preferibile perché distingue meglio i termini che appaiono molte volte ma in pochi documenti (spesso termini tecnici molto rilevanti).
+
+
+
+
+
