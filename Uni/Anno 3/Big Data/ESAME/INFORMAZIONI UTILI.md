@@ -36,7 +36,7 @@ Più in generale
 ![[Pasted image 20260323113432.png]]
 
 ## Probabilità condizionata
-La probabilità condizionata che un evento `E` capiti sapendo che un evento `F` è già accaduto è data dall'intersezione delle loro probabilità fratto la probabilità di `F`.
+La probabilità condizionata che un evento `E` capiti sapendo che un evento `F` è già accaduto è data dall'intersezione delle loro probabilità fratto la probabilità di `F`
 ![[Pasted image 20260323113609.png]]
 
 ![[Pasted image 20260323113621.png]]
@@ -139,5 +139,86 @@ Un problema classico per stimare il tempo di completamento di una collezione (o 
 ---
 
 
+# MITZ-UPFAL CH-03
+## Disuguaglianza di Markov
+È lo strumento più semplice per porre un limite superiore (upper bound) alla probabilità che una variabile aleatoria superi una certa soglia.
+>[!lemma] Teorema 
+>Per ogni variabile aleatoria **non negativa** $X$ e per ogni $a > 0$:$$\Pr(X \geq a) \leq \frac{E[X]}{a} \ \ \ \ \frac{\rightarrow \text{valor medio}}{\rightarrow \text{soglia}}$$
+* **Caratteristiche:**
+    * Non richiede l'indipendenza.
+    * È un "bound" debole perché usa solo il valore atteso (poca informazione).
+    * è utile se il risultato è $< 1$, ossia se `a` è molto grande
+* **Esempio (Coin Flips):** Qual è la probabilità di ottenere più di $3N/4$ teste in $N$ lanci?
+    *   $E[X] = N/2$. Applicando Markov: $\Pr(X \geq 3N/4) \leq \frac{N/2}{3N/4} = \frac{2}{3}$.
+    *   *Nota:* Questo limite è molto pessimistico, la probabilità reale è molto più bassa.
+![[Pasted image 20260331154817.png]]
 
 
+## Varianza e Deviazione Standard 
+Mentre il valore atteso indica il "centro", la **varianza** misura quanto i valori sono dispersi attorno ad esso.
+* **Definizione:** $Var[X] = E[(X - E[X])^2] = E[X^2] - (E[X])^2$.
+* **Deviazione Standard ($\sigma$):** $\sigma(X) = \sqrt{Var[X]}$. Ha la stessa unità di misura di $X$.
+*   **Intuizione grafica:**
+    ![[Pasted image 20260331154927.png|550]]
+
+
+## Disuguaglianza di Chebyshev 
+È più potente di Markov perché sfrutta la varianza per limitare la deviazione in entrambe le direzioni (troppo grande o troppo piccolo).
+>[!lemma] Teorema 
+>Per ogni variabile aleatoria $X$: $$\Pr(|X - E[X]| \geq a) \leq \frac{Var[X]}{a^2}$$
+* **Logica:** La probabilità che la r.v. $X$ si discosti dal suo valore medio per un fattore additivo $a$ è limitata dal rapporto tra varianza e $a^2$.
+>[!tip]- Dimostrazione (usando Markov)
+>![[Pasted image 20260331155703.png]]
+
+
+>[!lemma] Teorema
+>Per ogni variabile aleatoria $$Pr(|X - E[X]| \ge a\sigma[X]) \le \frac 1 {a^{2}}$$
+
+
+
+>[!lemma] Teorema dell'Indipendenza 
+>Se $X$ e $Y$ sono **indipendenti**:
+>    1.  $E[XY] = E[X] \cdot E[Y]$
+>    2.  $Var[X + Y] = Var[X] + Var[Y]$ (La varianza della somma è la somma delle varianze).
+
+
+## Analisi dei Coin Flips con Chebyshev
+Riprendendo l'esempio di $N$ lanci di moneta (Bernoulli trial):
+* Per una singola moneta (Bernoulli $p=1/2$): $E[X_i] = 1/2$ e $Var[X_i] = p(1-p) = 1/4$.
+* Per $N$ lanci indipendenti (Binomiale): $E[X] = N/2$ e $Var[X] = N/4$.
+* **Bound di Chebyshev:** La probabilità di avere $X \geq 3N/4$ (ovvero una deviazione $\geq N/4$ dalla media) è: $$\Pr(|X - N/2| \geq N/4) \leq \frac{N/4}{(N/4)^2} = \frac{4}{N}$$
+* **Conclusione:** Rispetto al $2/3$ di Markov, il limite di Chebyshev ($4/N$) è **significativamente migliore** perché diminuisce all'aumentare di $N$.
+
+![[Pasted image 20260331160407.png]]
+
+
+## Distribuzioni e Varianze Notevoli (Slide 15, 29-36)
+
+### Variabile Binomiale ($B(n, p)$)
+*   Somma di $n$ prove di Bernoulli indipendenti.
+![[Pasted image 20260331160509.png]]
+
+### Variabile Geometrica (Primo successo al tentativo $n$)
+- **Definizione:** una variabile aleatoria geometrica `X` con un parametro `p` è data da $$Pr(X=n) = (1-p)^{n-1}p$$con `n = 1, 2,...` 
+* **Valore Atteso:** $E[X] = 1/p$.
+* **Varianza:** $Var[X] = \frac{1-p}{p^2}$.
+* **Memoryless Property:** Il processo "dimentica" i fallimenti passati. $\Pr(X = n+k | X > k) = \Pr(X = n)$.
+
+## 6. Coupon Collector's Problem: Bound Avanzati
+Abbiamo già visto che il tempo atteso è $E[X] = nH_n \approx n \ln n$. 
+
+>[!question] Come varia questo tempo?
+* **Con Markov:** $\Pr(X \geq 2nH_n) \leq 1/2$. (Poco utile).
+* **Con Chebyshev:** Si dimostra che $Var[X] \leq \frac{\pi^2 n^2}{6}$. 
+	* Applicando Chebyshev, la probabilità di deviazione decresce come $O(\frac 1 {\ln^2 n})$. (Molto meglio)
+* **Direct Bound & Union Bound:**
+    * **Union Bound:** La probabilità che si verifichi almeno uno tra più eventi è $\leq$ alla somma delle singole probabilità: $$\Pr(\cup A_i) \leq \sum \Pr(A_i)$$
+    ![[Pasted image 20260331161401.png]]![[Pasted image 20260331161452.png]]
+    * Per l'**Union Bound**, la probabilità che *almeno un* coupon manchi è $\leq n \cdot e^{-(n \ln n + cn)/n} = e^{-c}$.
+    *   Se scegliamo $c = \ln n$ (ovvero $t = 2n \ln n$), la probabilità di fallimento è solo $\frac 1 n$.
+	    ![[Pasted image 20260331161606.png]]
+
+## Legge dei Grandi Numeri
+Spiega perché campionare più volte un fenomeno ci dà una stima precisa.
+* **Vantaggio dei campioni multipli:** Se prendiamo la media di $n$ variabili indipendenti $\bar{X} = \frac{1}{n}\sum X_i$, la varianza della media è: $$Var[\bar{X}] = \frac{1}{n^2} \sum Var[X_i] = \frac{Var[X]}{n}$$    *La varianza diminuisce linearmente col numero di campioni!*
+* **Legge Debole dei Grandi Numeri:** Al crescere del numero di campioni $n$, la media campionaria $\bar{X}_n$ converge quasi certamente al valore atteso reale $E[X]$. $$\lim_{n \to \infty} \Pr(|\bar{X}_n - E[X]| \leq \epsilon) = 1$$*In Big Data, questo giustifica l'uso del campionamento (sampling) per approssimare proprietà di dataset enormi.*

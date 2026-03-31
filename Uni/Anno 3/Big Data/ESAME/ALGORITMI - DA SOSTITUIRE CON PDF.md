@@ -189,5 +189,79 @@ Sebbene l'algoritmo sia deterministico, possiamo farne un'**analisi probabilisti
 >- **Las Vegas:** Produce **sempre** il risultato corretto. Il tempo di esecuzione è la variabile aleatoria (es. QuickSort probabilistico).
 
 
+---
+
+# MITZ-UPFAL CH-03
+## Algoritmo per il Calcolo della Mediana
+### Il Problema
+La **mediana** di un insieme $X$ di $n$ elementi è l'elemento in posizione $\lceil n/2 \rceil$ una volta ordinato l'insieme.
+
+**Approccio Deterministico:** Ordinare l'intero set costa $O(n \log n)$. 
+- Esiste un algoritmo deterministico $O(n)$ (il *Median-of-Medians*), ma è estremamente complesso e ha costanti molto alte, rendendolo poco pratico per i Big Data.
+
+**Approccio Randomizzato:** L'obiettivo è trovare la mediana con un tempo di calcolo **lineare** $O(n)$ e un'alta probabilità di successo, usando solo una piccola porzione dei dati.
+
+### Randomized Median Algorithm
+L'idea è creare un "piccolo" sotto-insieme $C$ (candidati) che contenga con certezza la mediana e che sia abbastanza piccolo da essere ordinato velocemente.
+#### Step dell'algoritmo:
+1. **Campionamento:** Si estraggono $s = n^{3/4}$ elementi da $S$ in modo casuale (con reinserimento) e si mettono in un multi-set $R$.
+2. **Ordinamento del campione:** Si ordina $R$. Essendo $|R| = n^{3/4}$, il costo è $O(n^{3/4} \log n)$, che è **sub-lineare** rispetto a $n$.
+3. **Scelta dei Pivot ($d$ e $u$):** Si scelgono due elementi da $R$ che facciano da pivots per delimitare la mediana:
+    - $d$ (down): l'elemento in posizione $(\frac{1}{2} n^{3/4} - \sqrt{n})$ in $R$.
+    - $u$ (up): l'elemento in posizione $(\frac{1}{2} n^{3/4} + \sqrt{n})$ in $R$.
+4. **Filtraggio:** Si confrontano tutti gli elementi di $S$ con $d$ e $u$ per trovare l'insieme $C = \{x \in S : d \leq x \leq u\}$. Durante questo passaggio si contano anche quanti elementi sono più piccoli di $d$ ($\ell_d$) e quanti più grandi di $u$ ($\ell_u$).
+	- se $\ell_{d} > \frac n 2$ oppure $\ell_{u} > \frac n 2$ -> FALLISCI
+		- se più della metà degli elementi sono più piccoli di `d` o più grandi di `u` vuol dire che `C` è troppo piccolo e la mediana sta fuori 
+5. **Verifica e Output:** L'algoritmo fallisce se la mediana non è in $C$ (già visto prima) o se $C$ è troppo grande. Altrimenti, si ordina $C$ e si estrae la mediana.
+	- per ordinarlo dobbiamo avere $|C| \le 4n^{\frac 3 4}$ 
+
+![[Pasted image 20260331164617.png]]
+
+### Intuizioni
+![[Pasted image 20260331171614.png]]
+
+### Condizioni di Fallimento
+Sia $Y_{1}$ il numero di campioni sotto la mediana.
+Sia $Y_{2}$ il numero di campioni sopra la mediana.
+
+L'algoritmo fallisce se accade uno dei seguenti eventi:
+- **$E_1$:** Ci sono troppi pochi campioni piccoli in $R$ ($Y_1 < \frac{1}{2} n^{3/4} - \sqrt{n}$), il che porta $R$ a essere troppo spostato a `sx`
+- **$E_2$:** Ci sono troppi pochi campioni grandi in $R$,  il che porta $R$ a essere troppo spostato a `dx`
+- **$E_3$:** L'insieme dei candidati $C$ è troppo grande ($|C| > 4n^{3/4}$), rendendo l'ordinamento finale troppo costoso.
+
+## Analisi Probabilistica
+Per dimostrare che l'algoritmo funziona "quasi sempre", usiamo la **Disuguaglianza di Chebyshev**.
+
+### Analisi di $E_1$ (per $E_{2}$ è identica) (Varianza e Chebyshev):
+- Ogni estrazione in $R$ è una **Bernoulliana** con $p=1/2$ (metà elementi sono $\leq$ mediana).
+- $Y_1$ segue quindi una **Binomiale** con $n^{3/4}$ prove.
+- **Valore Atteso:** $E[Y_1] = \frac{1}{2} n^{3/4}$.
+- **Varianza:** $Var[Y_1] = n^{3/4} \cdot \frac{1}{2} \cdot \frac{1}{2} = \frac{1}{4} n^{3/4}$.
+
+Applichiamo **Chebyshev** per vedere quanto è probabile che $Y_1$ si allontani dalla media di un fattore $\sqrt{n}$ (che è la distanza fissata per il pivot $d$):
+$$\Pr(E_1) \leq \Pr(|Y_1 - E[Y_1]| \geq \sqrt{n}) \leq \frac{Var[Y_1]}{(\sqrt{n})^2} = \frac{\frac{1}{4} n^{3/4}}{n} = \frac{1}{4} n^{-1/4}$$
+
+Lo stesso vale per $Pr(E_{2})$.
+
+
+### Analisi di $E_{3}$
+L'evento $E_3$ si verifica se l'insieme dei candidati $C$ è troppo grande ($|C| > 4n^{3/4}$). Se $C$ è troppo grande, l'ordinamento finale non sarebbe più efficiente. 
+
+**Logica della dimostrazione:**
+Perché $|C|$ sia maggiore di $4n^{3/4}$, deve accadere che i pivot $d$ e $u$ siano finiti "troppo lontano" dalla mediana reale. In particolare, definiamo due sotto-eventi:
+1.  **$\mathcal{E}_{3,1}$**: Almeno $2n^{3/4}$ elementi di $C$ sono più grandi della mediana (ovvero $u$ è troppo a destra).
+2.  **$\mathcal{E}_{3,2}$**: Almeno $2n^{3/4}$ elementi di $C$ sono più piccoli della mediana (ovvero $d$ è troppo a sinistra).
+
+Se $|C| > 4n^{3/4}$, allora almeno uno di questi due eventi deve essersi verificato.
+
+La probabilità che si verifichi $\mathcal{E}_{3,1}$ (vale lo stesso per $\mathcal{E}_{3,2}$) è $$\Pr(\mathcal{E}_{3,1}) \leq \frac{Var[X]}{(\sqrt{n})^2} = \frac{\frac{1}{4}n^{3/4}}{n} = \frac{1}{4}n^{-1/4}$$
+Quindi $$Pr(E_{3}) \le \frac 1 2 n^{-1/4}$$
+
+### Conclusione:
+- Sommando le probabilità di fallimento (Union Bound), si dimostra che la probabilità di successo è:$$P(Successo) \geq 1 - \frac{1}{n^{1/4}}$$
+- **Risultato:** L'algoritmo trova la mediana in tempo **$O(n)$** con probabilità che tende a $1$ per $n$ molto grande (**With High Probability**).
+
+
+
 
 
