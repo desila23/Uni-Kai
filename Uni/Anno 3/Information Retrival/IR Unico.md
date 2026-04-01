@@ -41,6 +41,8 @@ Le due metriche principali sono:
 - RECALL  
 	Conta **quanti documenti rilevanti hai recuperato rispetto a tutti i documenti rilevanti che esistono nella collezione**. $$\text{Recall} = \frac {\text{documenti rilevanti recuperati}} {\text{documenti rilevanti totali}}$$
 
+![[Pasted image 20260401115048.png]]
+
 
 In generale:
 - precision → qualità dei risultati
@@ -598,7 +600,7 @@ Quindi si fa una **query booleana tra biword**.
 
 ### Problema dei biword
 #### 1. Falsi positivi
-Il problema è che questa tecnica può produrre **false positives**.
+Il problema è che questa tecnica può produrre **falsi positivi**.
 
 Esempio:
 Un documento contiene:
@@ -915,7 +917,7 @@ Un algoritmo semplice di indicizzazione potrebbe essere:
 
 Questo approccio funziona solo se **tutti i dati entrano in memoria**.
 
-Ma nelle collezioni reali questo **non è possibile**, e mettere tutto nel disco comporterebbe troppi sekk time.
+Ma nelle collezioni reali questo **non è possibile**, e mettere tutto nel disco comporterebbe troppi seek time.
 
 
 ---
@@ -1025,10 +1027,7 @@ Questo è semplice perché:
 - le postings lists sono **già ordinate per docID**
 - i blocchi sono stati costruiti in modo **incrementale**
 
-Quindi per fare il merge basta:
-```
-concatenare le liste
-```
+Quindi per fare il merge basta concatenare le liste
 
 Esempio:
 ```

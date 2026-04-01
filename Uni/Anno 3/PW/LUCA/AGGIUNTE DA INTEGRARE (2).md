@@ -1,0 +1,39 @@
+### domanda tipica da esame
+#### BOX MODEL
+- le proprietà CSS si applicano al box dell'elemento
+	- il box tecnicamente rappresenta...
+	- la dimensione del box è in base alla dimensione dell'elemento
+		- si può visualizzare con border
+		- si può modificare con `width` e `height`
+			- sono date dalla somma tra width oppure height poi padding, border, margin
+	- ogni elemento è caratterizzato da 4 aree formati da 4 pezzi, *left,right, top, bottom*
+		- area del contenuto
+		- area del padding 
+		- area del bordo
+			- diversi stili, solid double ecc...
+			- si possono mettere anche inline come border:val colore, val... ecc...
+		- area del margine
+	- sono visibili da browser dentro styles
+- area visibile, si riferisce alla comprensione delle aree...
+- box sizing è una nuova specifica in css3
+	- ci permette di precisare la modalità di una box
+	- content box
+		- se in questa modalità la somma prevede solo...
+	- border box
+		- se in questa modalità la sottrazione avviene...
+		- utile per caso di utilizzo di dimensioni relative
+			- esempio a slide 21
+	- non si può controllare il margine di tutti gli elementi ma si può controllare solo degli elementi inline da dx e sx
+		- solo degli elementi replace si può controllare anche sopra e sotto
+	- collasso dei margini, se definisco 2 margini bottom e top vince il valore massimo
+		- se uso float non collassano(FORSE)
+- ![[Pasted image 20260331121034.png]]
+	- i margini possono avere valori negativi
+		- utile per muovere o nascondere elementi 
+	- puoi specificare la dimensione di una area inline
+		- serve per specificare le varie parti del margin quindi top px bottom px left px right px(non so bene l'ordine)
+- proprietà overflow
+	- taglia rischio di strapuzzo del padding 
+###### Background
+- aggiungi comandi 
+- `*` selettore che prende tutti gli elementi 
