@@ -1113,3 +1113,67 @@ h1 {
 
 
 ---
+
+# CSS: Posizionamento e Flusso degli Elementi
+
+### Il Concetto di Flusso (Flow)
+Il browser dispone gli elementi nella pagina secondo il loro ordine nel codice HTML:
+- **Block-level elements:** Vanno a capo e occupano tutta la larghezza disponibile.
+- **Inline elements:** Si dispongono uno accanto all'altro sulla stessa riga.
+
+![[Pasted image 20260402193216.png]]
+Per cambiare questo comportamento naturale si usano le proprietà `position` e `float`.
+
+### La Proprietà `position`
+Permette di definire come un elemento deve essere collocato nella pagina.
+
+| Valore         | Descrizione                                                                                                                                |
+| :------------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
+| **`static`**   | (Default) L'elemento segue il flusso normale del documento. Le proprietà `top`, `right`, ecc. non hanno effetto.                           |
+| **`relative`** | L'elemento viene spostato **rispetto alla sua posizione originale**. Lo spazio che occupava originariamente viene mantenuto vuoto.         |
+| **`absolute`** | L'elemento viene rimosso dal flusso e posizionato rispetto al suo **Containing Block**. Gli altri elementi agiscono come se non esistesse. |
+| **`fixed`**    | L'elemento è rimosso dal flusso e posizionato rispetto alla **viewport** (finestra del browser). Resta fermo anche durante lo scroll.      |
+![[Pasted image 20260402193706.png]]
+#### Specificare le coordinate
+Una volta impostata una `position` diversa da `static`, si usano:
+- `top`, `bottom`, `left`, `right`: definiscono la distanza dai bordi di riferimento.
+- **Containing Block (Importante):** Per un elemento `absolute`, il riferimento è il primo antenato che abbia una posizione **diversa da static**. Se non esiste, il riferimento è il `body`.
+
+
+
+### Gestione delle Sovrapposizioni: `z-index`
+![[Pasted image 20260402193717.png]]
+Quando gli elementi si sovrappongono (per via del posizionamento), si usa `z-index` per decidere l'ordine di "impilamento" lungo l'asse Z (profondità).
+- Funziona solo su elementi **posizionati** (relative, absolute, fixed).
+- **Valore numerico:** Più alto è il valore, più l'elemento sta "sopra" (in primo piano).
+- Di default, gli elementi scritti dopo nel codice HTML appaiono sopra quelli scritti prima.
+
+
+### La Proprietà `float`
+La proprietà `float` sposta un elemento su un lato (destra o sinistra), permettendo ai contenuti testuali di circondarlo (wrapping).
+![[Pasted image 20260402193755.png]]
+- **Valori:** `left`, `right`, `none` (default).
+- **Caratteristiche principali:**
+    - L'elemento si stacca dal flusso normale ma **influenza** la disposizione del testo e degli elementi inline vicini.
+    - I margini dell'elemento flottante vengono mantenuti e non collassano.
+    - L'elemento flottante rimane contenuto nell'area del contenuto del suo genitore.
+
+### Pulizia dei Float: `clear`
+Quando non si vuole che un elemento subisca l'effetto di un `float` precedente (ovvero non vogliamo che gli stia accanto), si usa `clear`.
+- **Valori:** `left`, `right`, `both`.
+- Serve a "forzare" l'elemento ad andare sotto l'elemento flottante, ripristinando il flusso verticale.
+
+
+### Il Problema del Contenitore
+Un problema tipico è che **l'elemento contenitore non si allunga** per contenere i figli che hanno `float: left` o `right` (sembra che il contenitore sia "vuoto" o con altezza zero).
+![[Pasted image 20260402193838.png]]
+
+**Soluzione (tecnica vista nelle slide):**
+Per obbligare il contenitore a racchiudere i figli flottanti, bisogna dichiarare nel contenitore stesso:
+```css
+#container {
+    overflow: auto;  /* oppure hidden */
+    width: 100%;     /* opzionale, per sicurezza */
+}
+```
+Questo trucco (chiamato spesso *clearfix* semplificato) forza il browser a ricalcolare l'altezza del contenitore includendo gli elementi flottanti.
