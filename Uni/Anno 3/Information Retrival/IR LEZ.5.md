@@ -1,0 +1,58 @@
+
+##### Query come vettori
+- ordinare i documenti in base alla loro prossimità
+	- distanza tra vettori di termini
+		- caratterizzate da
+			- simmetria 
+			- non negatività
+			- 0 uguaglianza
+- perché la distanza ha delle limitazioni
+	- grafico a slide 41
+	- la query rich poor
+		- la term frequency aumenta di un documento
+			- non ci interessa la distanza del vettore ma l'angolo compreso tra essi
+			- quando due vettori coincidono 0 gradi
+			- quando due vettori sono a 90 gradi
+				- momento in cui i 2 vettori sono totalmente distanti
+					- vettori ortogonali
+				- vedere il coseno dell'angolo, se sono ortogonali 0, se sono coincidenti il coseno vale 1
+- la distanza è una metrica, quando due cose sono coincidenti vale 0
+	- quando sono massimamente simili vale 1, questa distanza si chiama cosin similarity
+- ordinare gli elementi seguendo l'angolo tra il vettore della query e il documento in ordine decrescente
+	- cosa è esattamente il vettore della query o del documento
+		- tf/idf forma il vettore! in teoria
+- il coseno tra due vettori può essere visto come il prodotto tra due vettori normalizzati
+	- vettore fratto la norma ti normalizza il vettore a distanza uno
+	- ciò ci consente di calcolare il coseno
+	- formula a slide 47
+	- problema: data sparseness
+		- il seguente sistema è bag of word
+			- se ho cane e rotwiler ha dimensione ortogonale
+		- tolto questo svantaggio la cosin similarity è comunque utile per rappresentare distanza
+		- compreso tra 0 e 1
+		- la normalizzazione ha un side effect:
+			- se non avessi normalizzato, ci sarebbe stato l'effetto garzanti ovvero in cui il dizionario sarebbe uscito per primo ogni volta
+			- invece ora con la normalizzazione non esce
+		- se scrivo information retrieval troverò tutti i documenti che contengono entrambi
+		- più corti
+		- pk?
+- pseudocodice di cosine score
+- noi non vogliamo tutti i documenti
+	- applichiamo precedentemente un filtro con l'or dei documenti che contengono uno o l'altro
+	- anche l'or prenderebbe molto, successivamente vedremo un affinamento alla selezione di documenti da valutare
+- vettore=tf idf
+- confronto tra tutto quello che abbiamo visto per dare peso alla frequenza di un documento(ho capito idf ma non so se in realtà è tf)
+	- natural
+	- boolean
+	- sum
+	- max frequency
+	- logarithmic
+	- fraction
+		- formula con n(t,d)/n(t,d)+k
+		- logaritmo cresce a infinito, questi saturano invece verso il valore 1
+		- grafico a slide quella colorata dopo 53
+		- 
+	- quello che useremo (BM25)
+		- con paradigma probabilistico 
+- non esiste il migliore, ma esiste il migliore per un certo ambiente
+	- attraverso benchmark
