@@ -1,4 +1,4 @@
-# Definizione di Information Retrival
+# 1. Definizione di Information Retrival
 L’Information Retrieval è il processo di trovare materiale (di solito documenti), di natura non strutturata (generalmente testo), che soddisfa un bisogno informativo dell’utente all’interno di grandi collezioni di dati, solitamente memorizzate su computer.
 
 # ASSUNZIONI DI BASE
@@ -762,7 +762,7 @@ Usando questa combinazione
 ---
 
 
-# Index Construction
+# 2. Index Construction
 L’obiettivo della **costruzione dell’indice** è trasformare una collezione di documenti in una struttura dati che permetta di eseguire le query in modo **veloce ed efficiente**.
 
 Nei sistemi di **Information Retrieval** questa struttura dati è l’**inverted index**.
@@ -910,10 +910,10 @@ Quindi gli algoritmi di indicizzazione cercano di:
 
 # Uso della memoria durante la costruzione dell’indice
 Un algoritmo semplice di indicizzazione potrebbe essere:
-1. leggere tutti i documenti
-2. generare tutte le coppie `(term, docID)`
-3. ordinarle
-4. costruire le postings lists.
+1. legge tutti i documenti
+2. genera tutte le coppie `(term, docID)`
+3. le ordina
+4. costruisce le postings lists.
 
 Questo approccio funziona solo se **tutti i dati entrano in memoria**.
 
@@ -942,7 +942,7 @@ Questi algoritmi sono fondamentali per i motori di ricerca reali.
 
 ### 1. Blocked Sort-Based Indexing (BSBI)
 L’idea è semplice:
-- dividere la collezione in **blocchi più piccoli** di dimensione fissa
+- dividere il token stream in **blocchi più piccoli** di dimensione fissa
 - processare **un blocco alla volta**
 - salvare i risultati intermedi su **disco**
 - infine **unire tutti i blocchi** per ottenere l’indice finale.
@@ -952,10 +952,10 @@ L’idea è semplice:
 
 #### Come funziona BSBI
 Il processo avviene in **quattro fasi principali**:
-1. dividere i documenti in **blocchi di dimensione uguale**
-2. per ogni blocco generare le coppie `(termID, docID)`
-3. **ordinare** queste coppie in memoria
-4. salvare su disco un **indice invertito del blocco**
+1. i documenti vengono divisi in **blocchi di dimensione uguale**
+2. per ogni blocco vengono generate le coppie `(termID, docID)`
+3. queste coppie vengono **ordinate** in memoria
+4. viene salvato su disco un **indice invertito del blocco**
 
 Alla fine tutti i blocchi vengono **uniti (merge)** per creare l’indice finale.
 
@@ -999,9 +999,7 @@ cioè la **posting list**.
 Ogni blocco produce quindi **un indice invertito parziale**.
 
 #### Merge dei blocchi
-Dopo aver processato tutti i blocchi, abbiamo diversi **indici parziali** salvati su disco.
-
-L’ultimo passo consiste nel **fonderli** in un unico indice.
+L’ultimo passo consiste nel **fondere gli indici invertiti parziali** in un unico indice.
 
 Il merge funziona così:
 1. si aprono **tutti i blocchi**
@@ -1051,9 +1049,9 @@ Non serve riordinare perché i docID del secondo blocco sono **maggiori di quell
 
 #### Complessità dell’algoritmo
 - Divido il mio insieme di documenti in `b` blocchi
-- Eseguo il merge per `b` volte su un blocco grande $\frac N b$ 
+- Eseguo il merge per $\frac N b$ volte su un blocco grande `b` 
 
-Quindi$$b \cdot \frac N b \cdot log\left(\frac N b\right) = N \cdot log\left(\frac N b\right)$$
+Quindi$$\frac N b \cdot b \cdot log\left(b\right) = N \cdot log\left( b\right)$$
 #### Tempo reale di costruzione dell’indice
 Nella pratica il tempo di indicizzazione è dominato da:
 1. **parsing dei documenti**
@@ -1064,7 +1062,7 @@ più che dall’ordinamento.
 ### 2. Single-pass In-Memory Indexing (SPIMI)
 L’algoritmo **Blocked Sort-Based Indexing (BSBI)** scala bene, ma ha due problemi:
 1. richiede una struttura per **mappare i termini in termID**
-2. i blocchi sono di dimensione fissa, quindi potrebbe accadere che viene usato il 90% di memoria (perdendo un 10% importante)
+2. i blocchi sono di dimensione fissa, quindi potrebbe accadere che su un blocco venga utilizzato il 90% di memoria (perdendo un 10% importante)
 
 Per questo si usa un algoritmo più scalabile chiamato:
 ```
@@ -1428,7 +1426,7 @@ Se faccio merge troppo spesso:
 - costo alto
 - rallentamenti
 
-## Logarithmic Merge
+## SOLUZIONE: Logarithmic Merge
 ![[Pasted image 20260317193954.png]]
 Soluzione più efficiente.
 
@@ -1445,8 +1443,8 @@ Ogni indice ha dimensione:
 
 # Struttura
 Hai:
-- `Z0` → in memoria (piccolo)  -> sarebbe l'Auxiliary index
-- `I0, I1, I2, ...` → su disco -> sarebbero i Main index
+- `Z0` → in memoria (piccolo)  -> l'Auxiliary index
+- `I0, I1, I2, ...` → su disco -> i Main index
 
 Dimensioni:
 ```
@@ -1461,7 +1459,7 @@ I3 ≈ 8n
 Ogni livello è il doppio del precedente.
 
 
-# Come funziona (passo passo)
+# Come funziona 
 ### 1. Arriva un nuovo dato
 Lo metti in:
 ```
@@ -1529,6 +1527,12 @@ query più lente
 ```
 
 
+### Come gestire l'eliminazione:
+- uso un **bit vector di invalidazione**
+- i documenti eliminati non vengono cancellati subito
+- ma filtrati a query time
+
+
 ---
 
 # Dynamic Indexing nei motori di ricerca
@@ -1581,7 +1585,7 @@ ordinamento per docID
 ---
 
 
-# Index Compression
+# 3. Index Compression
 Obiettivo:
 ```
 ridurre lo spazio occupato dall’indice (RAM + disco)
@@ -1618,11 +1622,10 @@ Esempi:
 
 #### Tabella vista a lezione
 ![[Pasted image 20260320172028.png]]
-Leggila, fa vedere come a seconda di cosa scegliamo di fare 
+Leggila, fa vedere come abbiamo dei miglioramenti a seconda di cosa scegliamo di fare 
 - rimuovere numeri
 - rimuovere `n` stopwords, 
 - fare lemmatizzazione
-Abbiamo un miglioramento di un tot di %.
 
 >[!tip]- Piccole spiegaizoni su alcuni punti
 >- Togliere le stopword in un NON POSITIONAL INDEX vuol dire togliere le righe più lunghe dalla matrice sparsa (credo valga anche per i positional index)
@@ -1633,7 +1636,7 @@ Abbiamo un miglioramento di un tot di %.
 
 
 La tabella è **lossy**:
-- cambia il contenuto dell’indice
+- cambia il contenuto dell’indice (tolgo stopwords)
 - non è più possibile tornare indietro
 
 ---
@@ -1695,30 +1698,30 @@ il numero di termini distinti cresce con i token, ma in modo sublineare
 
 # Zipf’s Law
 Descrive **come sono distribuite le frequenze delle parole** in una collezione.
+- NON serve a stimare quando riappare un termine, ma a capire **quanto spesso compaiono i termini rispetto agli altri**
 
-Se ordini i termini per frequenza:
-```
-frequenza ∝ 1 / rank
-```
+Se ordiniamo le parole per frequenza decrescente:
+   - la parola in posizione $i$ (cioè la i-esima più frequente) avrà una frequenza **inversamente proporzionale a i**
+    - dove:
+        - $i = 1$ → parola più frequente
+        - $i = 2$ → seconda più frequente
+        - ecc…
 
-Significa:
-- il termine più frequente compare tantissimo
-- il secondo circa la metà
-- il terzo ancora meno
-- ecc…
+In formula: $$cf_i \approx \frac{K}{i}$$
+    **cf = collection frequency**
 
-## Conseguenze
-- poche parole → frequenza altissima
-- tantissime parole → frequenza bassissima
+Se la parola più frequente compare un certo numero di volte:
+- la seconda compare circa la metà
+- la terza circa un terzo
+- e così via
 
-👉 distribuzione molto sbilanciata
+Le frequenze non vengono calcolate da Zipf:
+   - sono già presenti nei dati
 
-## Impatto sull’indice
-- alcune postings list sono **lunghissime**
-- molte sono **piccolissime**
-
-👉 la compressione deve funzionare bene su numeri piccoli  
-(perché i gap saranno piccoli)
+Zipf descrive il fatto che:
+   - poche parole sono **molto frequenti**
+   - moltissime parole sono **molto rare**
+![[Pasted image 20260407175250.png]]
 
 
 ---
@@ -2141,8 +2144,7 @@ Altro caso:
 ---
 
 
-
-# Dictionaries and Tolerant Retrieval
+# 4. Dictionaries and Tolerant Retrieval
 Il compito principale in questa fase è il **vocabulary lookup**: determinare se un termine di una query esiste nel vocabolario e identificare il puntatore alle relative *postings lists*.
 
 
@@ -2164,10 +2166,10 @@ Per gestire query generiche (es. `m*n*o`), si introduce il **Permuterm Index**.
 ### k-gram Index
 Più efficiente in termini di spazio rispetto al permuterm. 
 Un **k-gram** è una sequenza di $k$ caratteri.
-*   Si costruisce un indice invertito dove le "chiavi" sono i k-grammi e le "postings" sono i termini del vocabolario che li contengono.
-*   **Esempio (bigrammi per `castle`):** `$c, ca, as, st, tl, le, e$`.
-*   **Processamento:** Una query `re*ve` viene scomposta in `$r, re` AND `ve, e$`.
-*   **Post-filtering:** Poiché l'AND dei k-grammi può restituire falsi positivi (es. `red*` potrebbe restituire `retired` perché contiene i k-grammi richiesti ma non è un match testuale), è necessario un passaggio di verifica booleana sul set di candidati.
+* Si costruisce un indice invertito dove le "chiavi" sono i k-grammi e le "postings" sono i termini del vocabolario che li contengono.
+* **Esempio (bigrammi per `castle`):** `$c, ca, as, st, tl, le, e$`.
+* **Processamento:** Una query `re*ve` viene scomposta in `$r, re` AND `ve, e$`.
+* **Post-filtering:** Poiché l'AND dei k-grammi può restituire falsi positivi (es. `red*` potrebbe restituire `retired` perché contiene i k-grammi richiesti ma non è un match testuale), è necessario un passaggio di verifica booleana sul set di candidati.
 
 
 ## Spelling Correction
@@ -2207,7 +2209,7 @@ Data una parola osservata $x$ (potenzialmente errata), vogliamo trovare la parol
 $$\hat{w} = \text{argmax}_{w \in V} P(w|x) = \text{argmax}_{w \in V} P(x|w)P(w)$$
 
 Dove:
-*   **$P(w)$ (Language Model):** La probabilità a priori della parola nel linguaggio (quanto è comune $w$ nel corpus). 
+* **$P(w)$ (Language Model):** La probabilità a priori della parola nel linguaggio (quanto è comune $w$ nel corpus). 
 	* Si calcola tramite conteggi di unigrammi: $P(w) = \frac{C(w)}{T}$.
 		* $C(w)$ -> quante volte appare `w` nel documento
 		* $T$ -> numero totale di tokens
@@ -2233,7 +2235,7 @@ Fino ad ora abbiamo trattato la correzione di **non-word errors** (parole che no
 
 ### Il Problema dei Real-Word Errors
 Si verificano quando l'utente digita una parola esistente nel dizionario, ma diversa da quella intesa.
-*   **Necessità del contesto:** Per rilevare e correggere questi errori, non basta consultare il dizionario; è indispensabile analizzare le parole circostanti tramite un **Language Model**.
+* **Necessità del contesto:** Per rilevare e correggere questi errori, non basta consultare il dizionario; è indispensabile analizzare le parole circostanti tramite un **Language Model**.
 
 
 ## Il Modello del Canale Rumoroso (Noisy Channel)
@@ -2247,7 +2249,7 @@ Per ogni parola $x_i$ della frase, generiamo un set di candidati $Candidate(x_i)
 *   Tutte le parole nel dizionario a **edit distance 1** (o 2).
 *   Eventuali omofoni (parole con pronuncia simile).
 
-### 2. Language Model: Incorporare il Contesto
+### 2. Language Model *P(W)*: Incorporare il Contesto
 Il termine $P(W)$ rappresenta la probabilità della sequenza di parole. Per calcolarla in modo efficiente senza "esplodere" computazionalmente, si utilizza un **modello a bigrammi** (Catena di Markov):
 $$P(w_1, ..., w_n) = P(w_1)P(w_2|w_1)P(w_3|w_2)...P(w_n|w_{n-1})$$
 - $P(w_{i}|w_{i-1})$ -> probabilità che IN GENERALE la parola $w_{i}$ venga scritta dopo la parola $w_{i-1}$ 
@@ -2260,7 +2262,7 @@ In molti casi, una coppia di parole (bigramma) potrebbe non essere presente nel 
 $$P_{li}(w_k|w_{k-1}) = \lambda P_{uni}(w_k) + (1-\lambda)P_{bi}(w_k|w_{k-1})$$
 * **$\lambda$ (Peso):** Determina quanto "fidarsi" della parola singola rispetto alla coppia.
 * **Log-Probabilities:** Per evitare il *floating point underflow* (numeri troppo piccoli derivanti da molte moltiplicazioni), si lavora nel dominio dei logaritmi, trasformando i prodotti in somme: $$\log P(w_1...w_n) = \log P(w_1) + \sum \log P(w_i|w_{i-1})$$
-### 3. Channel Model: Probabilità di Errore
+### 3. Channel Model *P(X|W)*: Probabilità di Errore
 Il termine $P(X|W)$ stima la probabilità che la parola $w$ venga digitata come $x$. 
 * Se l'errore è una *non-word*, si usano le matrici di confusione già viste.
 * **Novità per Real-Words:** Dobbiamo definire la probabilità che una parola sia stata scritta correttamente (**No Error**), ovvero $P(w|w)$.
@@ -2292,22 +2294,21 @@ Queste sono migliorie estreme
 
 ---
 
-# Scoring, Term Weighting e il Modello Spaziale
-
-### 1. Limiti del Recupero Booleano (Ranked Retrieval)
+# 5. Scoring, Term Weighting e il Modello Spaziale
+### Limiti del Recupero Booleano (Ranked Retrieval)
 Il sistema booleano classico presenta diverse criticità per l'utente comune:
 * **Feast or Famine:** Le query booleane tendono a restituire o troppi risultati (difficili da esaminare) o zero risultati (se troppo specifiche).
 * **Assenza di Sfumature:** Un documento o soddisfa la query (match) o non la soddisfa. Non esiste una scala di rilevanza.
 
 ***Soluzione:*** Implementare il **Ranked Retrieval**, ordinando i documenti in base a un punteggio di "bontà" (*score*) rispetto alla query, agendo come un "soft AND".
 
-### 2. Il Punteggio di Matching (Scoring)
+### Il Punteggio di Matching (Scoring)
 Per ordinare i documenti, assegniamo un punteggio in un intervallo $[0, 1]$ a ogni coppia query-documento. Le premesse fondamentali sono:
 1.  Se nessun termine della query appare nel documento, lo score è 0.
 2.  Più un termine della query è frequente nel documento, maggiore deve essere lo score.
 3.  Più termini della query compaiono nel documento, maggiore deve essere lo score.
 
-### 3. Il Coefficiente di Jaccard
+### Il Coefficiente di Jaccard
 Un metodo statistico comune per misurare la sovrapposizione tra due insiemi (query $A$ e documento $B$):
 $$\text{JACCARD}(A, B) = \frac{|A \cap B|}{|A \cup B|}$$
 *   **Proprietà:** Restituisce 1 se gli insiemi sono identici, 0 se sono disgiunti.
@@ -2319,12 +2320,12 @@ $$\text{JACCARD}(A, B) = \frac{|A \cap B|}{|A \cup B|}$$
 >[!tip]- Il limite enorme 
 >Se nel documento la parola "Virus" appare 100 volte, Jaccard la conta come **una sola volta**. Non gli importa se ne parli tanto o poco, gli importa solo che la parola "esista" nel set. Inoltre, tratta la parola "il" (comunissima) con la stessa importanza della parola "Criptovaluta" (rara e specifica).
 
-### 4. Rappresentazione dei Documenti
+### Rappresentazione dei Documenti
 * **Binary Incidence Matrix:** Rappresenta i documenti come vettori binari $\{0, 1\}^{|V|}$. Indica solo la presenza/assenza del termine.
 * **Count Matrix:** Rappresenta i documenti come vettori di conteggi in $\mathbb{N}^{|V|}$.
 * **Bag of Words Model:** Questo modello ignora l'ordine delle parole. "John è più veloce di Mary" e "Mary è più veloce di John" hanno la stessa rappresentazione. Nonostante la perdita di informazione, è una semplificazione efficace per il ranking.
 
-### 5. Term Frequency (tf)
+### Term Frequency (tf)
 La frequenza grezza (*raw tf*) non è ideale perché la rilevanza non aumenta proporzionalmente alla frequenza (un documento con 10 occorrenze non è 10 volte più rilevante di uno con 1 sola).
 
 * **Log-frequency Weighting:** Si applica una trasformazione logaritmica per "smorzare" (*dampen*) l'effetto:$$w_{t,d} = \begin{cases} 1 + \log_{10} \text{tf}_{t,d} & \text{se } \text{tf}_{t,d} > 0 \\ 0 & \text{altrimenti} \end{cases}$$
@@ -2334,7 +2335,7 @@ La frequenza grezza (*raw tf*) non è ideale perché la rilevanza non aumenta pr
 >[!tip] Il trucco del Logaritmo 
 >Usiamo il logaritmo per "schiacciare" i numeri grandi. Il logaritmo trasforma i grandi incrementi in piccoli passi. In questo modo, un documento con tantissime occorrenze avrà un punteggio più alto, ma non distruggerà gli altri documenti nel ranking solo perché è più lungo o ripetitivo.
 
-### 6. Inverse Document Frequency (idf)
+### Inverse Document Frequency (idf)
 Non tutti i termini hanno lo stesso potere discriminante. I termini rari sono più informativi dei termini frequenti (es. *Feniletilamina* vs *andare*).
 * **Document Frequency ($\text{df}_t$):** Numero di documenti nella collezione che contengono il termine $t$.
 * **Peso idf:** Misura l'informatività di un termine.$$\text{idf}_t = \log_{10} \frac{N}{\text{df}_t}$$
@@ -2357,7 +2358,7 @@ Non tutti i termini hanno lo stesso potere discriminante. I termini rari sono pi
 
 
 
-### 7. Rappresentazione Vettoriale dei Documenti e delle Query
+### Rappresentazione Vettoriale dei Documenti e delle Query
 Dopo aver calcolato i pesi **tf-idf** per ogni termine in un documento, possiamo rappresentare sia i documenti che le query come **vettori** in uno spazio ad alta dimensionalità.
 
 * **Vettori Documento:** Ogni documento $d$ è un vettore di pesi tf-idf $\vec{d} \in \mathbb{R}^{|V|}$, dove $|V|$ è la dimensione del vocabolario (numero di termini distinti).
@@ -2366,7 +2367,7 @@ Dopo aver calcolato i pesi **tf-idf** per ogni termine in un documento, possiamo
 * **Alta Dimensionalità:** Per un motore di ricerca web, la dimensionalità può essere di decine di milioni.
 * **Vettori Sparsi:** La maggior parte delle componenti di questi vettori è zero, poiché un documento contiene solo una piccola frazione di tutti i termini possibili.
 
-### 8. Rappresentazione Vettoriale delle Query
+### Rappresentazione Vettoriale delle Query
 L'idea chiave è applicare la stessa logica anche alle query:
 * **Query come Vettori:** Anche le query possono essere rappresentate come vettori nello stesso spazio ad alta dimensionalità dei documenti, utilizzando gli stessi pesi tf-idf.
 * **Ranking per Prossimità:** L'obiettivo è ordinare i documenti in base alla loro "prossimità" o "somiglianza" alla query.
@@ -2379,9 +2380,8 @@ Un primo approccio potrebbe essere usare la distanza euclidea tra i punti finali
 * **Sensibilità alla Lunghezza:** La distanza euclidea è pesantemente influenzata dalla lunghezza dei vettori. Un documento lungo (che contiene molte più occorrenze di termini) avrà un vettore di lunghezza maggiore, anche se semanticamente simile a un documento più corto.
     * **Esempio:** Se un documento $d'$ è identico a un documento $d$ ma ripetuto due volte (quindi due volte più lungo), semanticamente sono identici. L'angolo tra i loro vettori sarà 0, indicando massima similarità. Tuttavia, la distanza euclidea tra $d$ e $d'$ risulterà grande, suggerendo bassa similarità.
     * Questo è un problema perché si darebbe un peso eccessivo a documenti semplicemente più lunghi, anche se non più rilevanti. Un classico esempio sarebbe un **dizionario** che, contenendo un'enorme quantità di parole, risulterebbe sempre tra i primi risultati se non si applicasse una normalizzazione per la lunghezza 
-* **Conclusioni:** La distanza euclidea è una cattiva idea per misurare la similarità semantica in questo contesto.
 
-### 9. Similarità tramite Angoli: La Funzione Coseno
+### Similarità tramite Angoli: La Funzione Coseno
 Un approccio migliore è ordinare i documenti in base all'angolo che il loro vettore forma con il vettore della query.
 * **Angolo vs Distanza:**
     * Quando due vettori sono **coincidenti** (stessa direzione, massima similarità), l'angolo è **0 gradi**.
@@ -2400,7 +2400,7 @@ Per rendere l'angolo una misura efficace di similarità, è essenziale che la lu
     Dopo la normalizzazione, i vettori avranno lunghezza 1 e saranno proiettati su una sfera unitaria.
 * **Benefici:** Documenti più lunghi e più corti avranno pesi dello stesso ordine di grandezza dopo la normalizzazione. Questo risolve il problema dei documenti lunghi che dominerebbero il ranking senza normalizzazione. Il documento $d'$ (doppio di $d$) dopo la normalizzazione avrà lo stesso vettore di $d$.
 
-### 10. Similarità del Coseno (Cosine Similarity)
+### Similarità del Coseno (Cosine Similarity)
 Per vettori normalizzati, la similarità del coseno è equivalente al **prodotto scalare (dot product)** tra i vettori.
 
 * **Formula:** La similarità del coseno tra una query $\vec{q}$ e un documento $\vec{d}$ è definita come: $$\text{cos}(\vec{q}, \vec{d}) = \text{SIM}(\vec{q}, \vec{d}) = \frac{\vec{q} \cdot \vec{d}}{||\vec{q}|| \cdot ||\vec{d}||} = \frac{\sum_{i=1}^{|V|} q_i d_i}{\sqrt{\sum_{i=1}^{|V|} q_i^2} \sqrt{\sum_{i=1}^{|V|} d_i^2}}$$
@@ -2418,7 +2418,7 @@ L'esempio con i romanzi mostra come:
 3.  Si normalizzino i vettori (in questo esempio, senza idf per semplicità).
 4.  Si calcolano le similarità del coseno, mostrando che `Sense and Sensibility` e `Pride and Prejudice` sono più simili tra loro di quanto lo siano con `Wuthering Heights`, riflettendo la vicinanza stilistica e tematica.
 
-### 12. Calcolo del Punteggio Coseno (COSINESCORE)
+### Calcolo del Punteggio Coseno (COSINESCORE)
 L'algoritmo per calcolare i punteggi di similarità del coseno tra una query e l'intera collezione di documenti è il seguente:
 ![[Pasted image 20260403175311.png]]
 
@@ -2446,10 +2446,10 @@ COSINESCORE(q)
     * **Pre-filtering:** Per evitare di scorrere tutte le posting list per ogni termine della query, si può applicare un filtro iniziale (ad esempio, un OR di tutti i termini della query) per selezionare un sottoinsieme più piccolo di documenti candidati da valutare in dettaglio.
     * **Estrazione Top K:** I $K$ elementi con i punteggi più alti possono essere estratti efficientemente usando una **priority queue** (ad esempio, un heap).
 
-### 13. Varianti di Pesatura (tf e idf)
+### Varianti di Pesatura (tf e idf)
 Esistono numerose varianti per le funzioni di pesatura tf e idf, ognuna con diverse assunzioni e scopi:
 #### Varianti di tf Weighting
-*   **Natural ($\text{TF}_{\text{total}}(t,d) = n(t,d)$):** Semplicemente il conteggio grezzo. Non ha normalizzazione per la lunghezza del documento, favorendo i documenti più lunghi.
+*  **Natural ($\text{TF}_{\text{total}}(t,d) = n(t,d)$):** Semplicemente il conteggio grezzo. Non ha normalizzazione per la lunghezza del documento, favorendo i documenti più lunghi.
 *   **Boolean ($\text{TF}_{\text{bool}}(t,d)$):** 1 se il termine è presente, 0 altrimenti.
 *   **Sum ($\text{TF}_{\text{sum}}(t,d) = n(t,d)/N(d)$):** Normalizza per la lunghezza del documento. Tutti i documenti con la stessa frazione di occorrenze avrebbero lo stesso punteggio.
 *   **Max ($\text{TF}_{\text{max}}(t,d)$):** Normalizza per la frequenza massima del termine nel documento.
@@ -2460,5 +2460,7 @@ Esistono numerose varianti per le funzioni di pesatura tf e idf, ognuna con dive
 #### Varianti di idf Weighting
 Anche per l'idf esistono diverse formulazioni, che variano principalmente nel modo in cui gestiscono il logaritmo e le costanti aggiunte per lo smoothing, influenzando come si "smorzano" i termini rari e comuni.
 
-*   **Conclusione sulle Varianti:** Non esiste un singolo schema di pesatura "migliore" in assoluto. La scelta dipende dall'ambiente specifico, dal tipo di collezione e dalle esigenze dell'applicazione.
-* Ogni variante offre un trade-off tra complessità, accuratezza e performance.
+
+>[!tip] Conclusione sulle Varianti 
+>Non esiste un singolo schema di pesatura "migliore" in assoluto. La scelta dipende dall'ambiente specifico, dal tipo di collezione e dalle esigenze dell'applicazione.
+>* Ogni variante offre un trade-off tra complessità, accuratezza e performance.
