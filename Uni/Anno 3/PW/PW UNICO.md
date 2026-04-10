@@ -1177,3 +1177,154 @@ Per obbligare il contenitore a racchiudere i figli flottanti, bisogna dichiarare
 }
 ```
 Questo trucco (chiamato spesso *clearfix* semplificato) forza il browser a ricalcolare l'altezza del contenitore includendo gli elementi flottanti.
+
+
+### FLEXBOX DISPLAY
+Il **Flexbox** (Flexible Box Layout) è un modello di layout unidimensionale progettato per distribuire lo spazio tra gli elementi di un contenitore, anche quando le loro dimensioni sono dinamiche o sconosciute.
+
+>[!tip] Il modello Flexbox è lo standard per la creazione di menu e barre di navigazione (Navbar).
+
+**Attivazione**: Si applica al contenitore genitore tramite la proprietà `display: flex;` (o `inline-flex`).
+![[Pasted image 20260409152557.png]]
+
+**Terminologia e Geometria (Flex Geometry)**:
+![[Pasted image 20260409152629.png]]
+*   **Flex Container**: L'elemento genitore.
+*   **Flex Items**: Gli elementi figli diretti.
+*   **Main Axis (Asse Principale)**: L'asse lungo il quale vengono disposti gli elementi (definito da `flex-direction`).
+*   **Cross Axis (Asse Trasversale)**: L'asse perpendicolare a quello principale.
+*   **Main Start / Main End**: Punti di inizio e fine del flusso degli elementi.
+
+### PROPRIETÀ DEL CONTENITORE (FLEX CONTAINER)
+#### A. Direzione e Avvolgimento
+*   **`flex-direction`**: Definisce la direzione dell'asse principale.
+    *   `row` (default): Orizzontale (sinistra → destra).
+    *   `row-reverse`: Orizzontale invertito (destra → sinistra).
+    *   `column`: Verticale (alto → basso).
+    *   `column-reverse`: Verticale invertito (basso → alto).
+![[Pasted image 20260409153309.png]]
+
+
+*   **`flex-wrap`**: Gestisce il comportamento degli elementi quando superano la larghezza del contenitore.
+    *   `nowrap` (default): Tutti gli elementi su una sola riga (possono uscire dal contenitore).
+    *   `wrap`: Gli elementi vanno a capo su più righe.
+    *   `wrap-reverse`: Gli elementi vanno a capo invertendo l'ordine delle righe.
+![[Pasted image 20260409153344.png]]
+
+#### Allineamento (Distribuire lo spazio)
+*   **`justify-content`**: Allinea gli elementi lungo il **Main Axis** (Asse Principale).
+    *   `flex-start`: Elementi ammassati all'inizio.
+    *   `flex-end`: Elementi ammassati alla fine.
+    *   `center`: Elementi centrati.
+    *   `space-between`: Spazio distribuito *tra* gli elementi (primo e ultimo attaccati ai bordi).
+    *   `space-around`: Spazio distribuito *attorno* agli elementi (spazio uguale ai lati).
+    *   `space-evenly`: Spazio uniforme tra gli elementi e tra elementi e bordi.
+    ![[Pasted image 20260409153430.png|300]]
+
+
+*   **`align-items`**: Allinea gli elementi lungo il **Cross Axis** (Asse Trasversale) per la riga corrente.
+    *   `flex-start` / `flex-end` / `center`.
+    *   `stretch` (default): Gli elementi si allungano per riempire il contenitore.
+    *   `baseline`: Allineamento basato sulla linea di base del testo.
+     ![[Pasted image 20260409153506.png]]
+
+
+### PROPRIETÀ DEGLI ELEMENTI FIGLI (FLEX ITEMS) 
+Queste proprietà si applicano direttamente ai singoli elementi all'interno del container flex.
+*   **`order`**: Permette di modificare l'ordine di visualizzazione senza toccare l'HTML.
+    *   Accetta numeri interi (positivi o negativi).
+    *   Valore di default: `0`. Gli elementi vengono visualizzati in ordine crescente.
+![[Pasted image 20260409153630.png]]
+
+
+*   **`align-self`**: Permette a un **singolo elemento** di avere un allineamento diverso rispetto a quello impostato per il gruppo con `align-items`.
+    *   Valori: `auto`, `flex-start`, `flex-end`, `center`, `baseline`, `stretch`.
+![[Pasted image 20260409153640.png]]
+
+
+## Layout delle pagine e responsive design
+### Tipologie di Layout 
+Il layout determina come i contenuti si distribuiscono nella pagina. Esistono due approcci principali:
+#### A. Layout Fluido (Fluid)
+I componenti hanno larghezze espresse in **percentuale (%)**.
+*   **Vantaggi**: Si adatta alla larghezza del browser; elimina spazi vuoti; non appaiono scrollbar orizzontali.
+*   **Svantaggi**: Su monitor molto grandi le righe di testo diventano troppo lunghe (difficili da leggere); difficile predire l'esatta resa grafica finale.
+
+#### B. Layout Fisso (Fixed)
+I componenti hanno larghezze espresse in **pixel (px)**.
+*   **Vantaggi**: Massimo controllo grafico e del numero di righe; facile da realizzare.
+*   **Svantaggi**: Su schermi piccoli il contenuto viene tagliato; su schermi grandi si creano ampi spazi vuoti laterali; l'utente non ha controllo sulla dimensione.
+
+![[Pasted image 20260409155056.png]]
+
+### Tabella Comparativa
+
+| Caratteristica          |    Fixed     |     Fluid     |
+| :---------------------- | :----------: | :-----------: |
+| **Adattabilità**        |      ❌       |       ✅       |
+| **Controllo grafico**   |      ✅       |       ❌       |
+| **Usabilità mobile**    |      ❌       |       ✅       |
+| **Complessità tecnica** | ✅ (Semplice) | ❌ (Complessa) |
+
+
+### Responsive Web Design (RWD)
+Consiste nel fornire layout differenti per schermi differenti utilizzando **un solo file HTML**, ma con **CSS variabili**.
+
+**I 3 pilastri del RWD:**
+![[Pasted image 20260409155158.png]]
+
+### PRIMO PILASTRO: Il Viewport 
+Il viewport è la "finestra virtuale" in cui il browser disegna il sito. I dispositivi mobili spesso "barano", dichiarando una larghezza di 980px e poi rimpicciolendo tutto (scaling) per farlo stare nello schermo fisico.
+
+**Soluzione: Il Tag META Viewport**
+Va inserito nell' `<head>` per istruire il browser a usare la larghezza reale del dispositivo:
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+```
+*   `width=device-width`: Imposta la larghezza della pagina a quella dello schermo del device.
+*   `initial-scale=1`: Imposta il livello di zoom iniziale.
+![[Pasted image 20260409155345.png]]
+
+
+### SECONDO PILASTRO: Media Queries
+Permettono di applicare stili CSS specifici solo se vengono soddisfatte determinate condizioni (Media Features).
+
+**Sintassi CSS:**
+```css
+@media screen and (max-width: 768px) {
+    /* Stili applicati solo su schermi fino a 768px */
+    .sidebar { display: none; }
+}
+```
+
+**Principali Media Features:**
+*   `width` / `height`: Larghezza/altezza del viewport.
+*   `orientation`: `portrait` (verticale) o `landscape` (orizzontale).
+*   `resolution`: Densità di pixel (es. per schermi Retina).
+
+Le query possono essere **complesse** usando operatori logici: `and`, `not`, o la virgola (che funge da `OR`).
+
+
+### Breakpoints e Strategie di Design (Slide 24-33)
+I **breakpoint** sono i punti di interruzione (espressi in px) in cui il layout cambia per adattarsi al nuovo spazio.
+
+#### Strategie di sviluppo:
+1.  **Mobile First (Consigliata)**: Si parte scrivendo il CSS per gli schermi piccoli (senza media query o con `min-width`). Si aggiungono poi regole per schermi più grandi. È una strategia di **Progressive Enhancement**.
+2.  **Desktop First**: Si parte dal layout desktop e si usano le media query (`max-width`) per "togliere" o rimpicciolire elementi. È una strategia di **Graceful Degradation**.
+
+**Esempio Mobile First (Slide 30):**
+```css
+/* Base: Mobile */
+.container { width: 100%; }
+
+/* Tablet */
+@media (min-width: 768px) {
+    .container { width: 750px; }
+}
+
+/* Desktop */
+@media (min-width: 1200px) {
+    .container { width: 1170px; }
+}
+```
+
