@@ -1,5 +1,5 @@
 # 1. Definizione di Information Retrival
-L’Information Retrieval è il processo di trovare materiale (di solito documenti), di natura non strutturata (generalmente testo), che soddisfa un bisogno informativo dell’utente all’interno di grandi collezioni di dati, solitamente memorizzate su computer.
+L’Information Retrieval è il processo di trovare materiale (di solito documenti), di natura non strutturata (generalmente testo), che soddisfa un bisogno informativo dell’utente all’interno di grandi collezioni di dati.
 
 # ASSUNZIONI DI BASE
 - Una **collezione** è un insieme di documenti -> nei modelli base si assume sia statica.
@@ -247,37 +247,6 @@ Il dictionary memorizza anche la **document frequency** cioè il numero di docum
 
 ---
 
-# Creazione di dictionary e postings
-A questo punto la struttura viene separata in due parti.
-
-### Dictionary
-Contiene:
-- il termine
-- la **document frequency**
-
-La **document frequency** indica **in quanti documenti compare il termine**.
-
-Esempio:
-```
-brutus → df = 2  
-caesar → df = 2
-```
-
-### Postings list
-Per ogni termine abbiamo la lista dei documenti:
-```
-brutus → 1 → 2  
-caesar → 1 → 2
-```
-
-Le liste sono **ordinate per docID**.
-
-Questo è fondamentale perché permette di eseguire velocemente le query.
-
-_inserisci immagine: schema completo dictionary + postings lists dopo il raggruppamento_
-
----
-
 # Dove vengono salvati i dati
 Nei sistemi reali:
 - il **dictionary** è spesso mantenuto **in memoria**
@@ -309,7 +278,7 @@ Il sistema deve restituire **i documenti che soddisfano la condizione logica**.
 # Passi per processare una query AND
 Consideriamo la query:
 ```
-Brutus AND Calpurnia
+Brutus AND Caesar
 ```
 
 Il motore di ricerca esegue questi passaggi.
@@ -397,7 +366,7 @@ Questo è molto efficiente anche per collezioni molto grandi.
 ---
 
 # Boolean Queries (Boolean Retrieval Model)
-Nel **Boolean Retrieval Model** una query è un’espressione logica costruita con AND, OR, NOT.
+Come abbiamo detto prima, nel **Boolean Retrieval Model** una query è un’espressione logica costruita con AND, OR, NOT.
 
 Il modello Booleano è uno dei più semplici per costruire un sistema di Information Retrieval.
 Vantaggi:
@@ -944,6 +913,7 @@ Questi algoritmi sono fondamentali per i motori di ricerca reali.
 L’idea è semplice:
 - dividere il token stream in **blocchi più piccoli** di dimensione fissa
 - processare **un blocco alla volta**
+	- ogni blocco contiene un numero di DocID incrementale rispetto al precedente
 - salvare i risultati intermedi su **disco**
 - infine **unire tutti i blocchi** per ottenere l’indice finale.
 
@@ -1077,7 +1047,6 @@ Single-pass in-memory indexing (SPIMI)
 La differenza principale rispetto a **BSBI** è che SPIMI:
 - usa **direttamente i termini**
 - non usa **termID**
-- non costruisce prima le coppie `(termID, docID)`
 
 Invece:
 - ogni termine viene **inserito subito nel dictionary**
@@ -1130,7 +1099,7 @@ Nel **BSBI**:
 >- **più efficiente in memoria**
 
 #### Scrittura su disco
-Quando la memoria si esaurisce:
+Quando la memoria si esaurisce (**SATURAZIONE DELLA MEMORIA RAM**):
 1. il dictionary e le postings list del blocco vengono scritti su **disco**
 2. prima di scrivere, i **termini vengono ordinati**
 
@@ -1276,21 +1245,6 @@ I vantaggi principali sono:
 
 
 # Distributed Indexing (approfondimento)
-Quando la collezione è troppo grande, non basta una sola macchina.
-
-Serve un sistema distribuito su più nodi:
-```
-cluster
-```
-
-Un problema importante è che:
-- le macchine possono **fallire**
-- possono essere **lente**
-- il lavoro deve continuare comunque
-
-Per questo il sistema deve essere progettato per lavorare in modo **parallelo e robusto**.
-
-
 ## Task paralleli
 L’idea è dividere il lavoro in **task indipendenti**.
 
@@ -1502,6 +1456,11 @@ Ogni posting viene toccato:
 ```
 T / n volte
 ```
+
+Quindi
+```
+T^2 / n
+```
 → pessimo
 
 ## Con logarithmic merge
@@ -1518,14 +1477,16 @@ tempo = O(T log(T/n))
 👉 molto più efficiente
 
 # Svantaggio
+##### Lentezza delle query
 Quando fai una query:
 - devi cercare in più indici (`I0, I1, I2...`)
-
 → quindi:
 ```
 query più lente
 ```
 
+##### Ranking sui MULTIPLE INDEXES (auxilary e main)
+Avere diversi indici non mi permette di eseguire un ranking in modo corretto (twitter risolve).
 
 ### Come gestire l'eliminazione:
 - uso un **bit vector di invalidazione**
@@ -1666,8 +1627,8 @@ M = kT^b
 dove:
 - `M` = numero di termini distinti (vocabolario)
 - `T` = numero totale di token
-- `k` ≈ 30–100
-- `b` ≈ 0.5–1
+- `k` ≈ 30–100 -> taranta a seconda dei benchmark
+- `b` ≈ 0.5–1 -> taranta a seconda dei benchmark
 
 ## Interpretazione
 Se aumentano i documenti:
@@ -1710,6 +1671,8 @@ Se ordiniamo le parole per frequenza decrescente:
 In formula: $$cf_i \approx \frac{K}{i}$$
     **cf = collection frequency**
 
+- `K` costante di normalizzazione -> generalmente il termine più frequente
+
 Se la parola più frequente compare un certo numero di volte:
 - la seconda compare circa la metà
 - la terza circa un terzo
@@ -1738,7 +1701,7 @@ Problema:
 - i puntatori occupano spazio
 
 
-## Approccio pigro -> senza ottimizzazione
+## Approccio Naive -> senza ottimizzazione
 ![[Pasted image 20260320172550.png]]
 Completamente inutile perché sprechiamo troppo spazio
 - anche per una lettera tipo `a` noi allochiamo 20 bytes di spazio
@@ -1760,7 +1723,7 @@ e per ogni termine memorizzo:
 
 ![[Pasted image 20260320172608.png]]
 
->[!question] Vedi come si calcola 22 byte. 
+>[!question] Vedi come si calcola 22 bit. 
 
 ### Vantaggio
 - elimino overhead delle singole stringhe
@@ -2144,23 +2107,21 @@ Altro caso:
 ---
 
 
-# 4. Dictionaries and Tolerant Retrieval
-Il compito principale in questa fase è il **vocabulary lookup**: determinare se un termine di una query esiste nel vocabolario e identificare il puntatore alle relative *postings lists*.
+# Dictionaries and Tolerant Retrieval
+In un sistema di Information Retrieval, il primo passo dopo la ricezione di una query è il **Vocabulary Lookup**: verificare se i termini della query esistono nel dizionario e recuperare i puntatori alle relative *postings lists*. Tuttavia, il sistema deve essere "tollerante" verso query non standard o errate.
 
 
 ## Wildcard Queries (Query con Caratteri Jolly)
-Le query con carattere `*` (che indica una stringa di lunghezza ≥ 0) si dividono in diverse tipologie di complessità crescente:
-
-### Trailing e Leading Wildcards
-* **Trailing (es. `mon*`):** Facilmente gestibili con un B-tree standard cercando tutti i termini nell'intervallo lessicografico.
+Le query con carattere `*` indicano una stringa di lunghezza ≥ 0 e si dividono in tre tipologie di complessità crescente:
+* **Trailing (es. `mon*`):** Facilmente gestibili con un **B-tree** standard cercando tutti i termini nell'intervallo lessicografico.
 * **Leading (es. `*mon`):** Richiedono un **Reverse B-tree**, ovvero un albero in cui i termini del dizionario sono memorizzati al contrario (es. `lemon` → `nomel`).
 * **Infix (es. `se*mon`):** Si risolvono intersecando i risultati di un B-tree (per `se*`) e di un Reverse B-tree (per `*mon`). Tuttavia, l'operazione è costosa.
 
 ### Permuterm Index
 Per gestire query generiche (es. `m*n*o`), si introduce il **Permuterm Index**. 
-1.  Si aggiunge un simbolo speciale `$` alla fine del termine (es. `hello$`).
-2.  Si memorizzano tutte le **rotazioni** del termine: `hello$`, `ello$h`, `llo$he`, `lo$hel`, `o$hell`, `$hello`.
-3.  **Processamento:** La query viene ruotata in modo che il `*` appaia quasi sempre alla fine.![[Pasted image 20260325103629.png]]
+*   **Struttura**: Si aggiunge un simbolo speciale `$` alla fine di ogni parola (es. `hello$`) e si memorizzano tutte le sue **rotazioni** cicliche nel dizionario.
+*   **Vantaggio**: Qualsiasi wildcard query può essere ruotata in modo che l'`*` finisca alla fine, trasformandola in una ricerca per prefisso.
+	![[Pasted image 20260325103629.png]]
 >[!problem] *Svantaggio:* La dimensione del dizionario esplode (empiricamente quadruplica).
 
 ### k-gram Index
@@ -2178,19 +2139,17 @@ Qui viene analizzato il modo in cui vengono corretti errori di battitura.
 >[!quote] Lucata
 >Quando vuoi scrivere "query" ma sbagli e scrivi "porcoddio".
 
-
 La correzione può essere 
 - **Isolated-term** (corregge il singolo termine senza guardare il contesto) 
 - **Context-sensitive** (usa le parole circostanti).
 
 ### Non-word ERROR
-Quando viene digitata una parola che non esiste.
 Generalmente questo errore si verifica quando la parola scritta non appartiene al nostro dizionario.
 Per correggerla
-- generiamo dei candidati -> parole reali che sono simile a quella scritta per errore
-	- il candidato migliore è quello che
-		- ha il peso minore rispetto all'edit distance -> ossia richiede il minor numero di cambiamenti
-		- ha la probabilità più alta di *noisy channel*
+1. **Generazione dei candidati**: Trovare parole reali simili a quella errata.
+2. **Scelta del miglior candidato**: Basata su due criteri:
+    * **Edit Distance**: Minimo numero di operazioni (inserimento, cancellazione, sostituzione, trasposizione) per trasformare una stringa in un'altra.
+    * **Noisy Channel Model**: Un approccio probabilistico.
 
 >[!tip] GENERALMENTE l'80% degli errori sono a edit distance 1, AL PIÙ 2.
 
@@ -2205,26 +2164,26 @@ Gli edit generalmente sono
 
 ### Noisy Channel Model (Modello del Canale Rumoroso)
 È l'approccio probabilistico standard basato sulla **Regola di Bayes**. 
+
+>[!tip] IDEA
+>L'idea è che l'utente abbia in mente una parola corretta ($w$), ma che passando attraverso un "canale rumoroso" (la tastiera/l'errore umano), questa venga trasformata in una parola errata ($x$).
+
 Data una parola osservata $x$ (potenzialmente errata), vogliamo trovare la parola corretta $\hat{w}$ che massimizza:
 $$\hat{w} = \text{argmax}_{w \in V} P(w|x) = \text{argmax}_{w \in V} P(x|w)P(w)$$
-
 Dove:
 * **$P(w)$ (Language Model):** La probabilità a priori della parola nel linguaggio (quanto è comune $w$ nel corpus). 
 	* Si calcola tramite conteggi di unigrammi: $P(w) = \frac{C(w)}{T}$.
 		* $C(w)$ -> quante volte appare `w` nel documento
 		* $T$ -> numero totale di tokens
-		![[Pasted image 20260325105527.png]]
-*   **$P(x|w)$ (Error Model / Likelihood):** La probabilità che scrivendo $w$ l'utente digiti $x$. 
-	* Si basa su una **Confusion Matrix** (es. probabilità di scambiare 'a' con 's' perché vicine sulla tastiera).
-
-### Error model $P(x|w)$
-Possiamo usare delle matrici 	![[Pasted image 20260325105611.png]]
-
-E su queste matrici fare dei calcoli
-![[Pasted image 20260325105838.png]]
+* **$P(x|w)$ (Error Model / Likelihood):** Probabilità che l'utente digiti $x$ avendo intenzione di scrivere $w$.
+	* Si calcola tramite **Confusion Matrix** (es. probabilità di scambiare 'a' con 's' perché vicine sulla tastiera).
+		* abbiamo una confusion matrix per ogni tipo di errore: `del`, `ins`, `sub` e `trans`
+		![[Pasted image 20260325105611.png]]
+		E su queste matrici fare dei calcoli
+		![[Pasted image 20260325105838.png]]
 
 #### Smoothing
-Per evitare divisioni per 0, aggiungiamo `1` a tutti i conteggi nella matrice e se abbiamo un alfabeto lungo `|A|`, normalizziamo correttamente.
+Per evitare divisioni per 0 (ERRORI MAI VISTI PRIMA), aggiungiamo `1` a tutti i conteggi nella matrice e se abbiamo un alfabeto lungo `|A|`, normalizziamo correttamente.
 ![[Pasted image 20260325110008.png]]
 
 ![[Pasted image 20260325110017.png]]
@@ -2237,19 +2196,18 @@ Fino ad ora abbiamo trattato la correzione di **non-word errors** (parole che no
 Si verificano quando l'utente digita una parola esistente nel dizionario, ma diversa da quella intesa.
 * **Necessità del contesto:** Per rilevare e correggere questi errori, non basta consultare il dizionario; è indispensabile analizzare le parole circostanti tramite un **Language Model**.
 
-
-## Il Modello del Canale Rumoroso (Noisy Channel)
+### Estensione del Noisy Channel
 Per la correzione basata sul contesto, estendiamo il modello probabilistico di Bayes applicandolo all'intera frase. 
 Data una sequenza di parole osservate $X = (x_1, x_2, ..., x_n)$, vogliamo trovare la sequenza di parole intese $W = (w_1, w_2, ..., w_n)$ che massimizza la probabilità a posteriori:
 $$\hat{W} = \text{argmax}_{W \in V} P(W|X) = \text{argmax}_{W \in V} P(X|W)P(W)$$
 
-### 1. Generazione dei Candidati
+#### 1. Generazione dei Candidati
 Per ogni parola $x_i$ della frase, generiamo un set di candidati $Candidate(x_i)$ che include:
 *   La parola stessa ($x_i$).
 *   Tutte le parole nel dizionario a **edit distance 1** (o 2).
 *   Eventuali omofoni (parole con pronuncia simile).
 
-### 2. Language Model *P(W)*: Incorporare il Contesto
+#### 2. Language Model *P(W)*: Incorporare il Contesto
 Il termine $P(W)$ rappresenta la probabilità della sequenza di parole. Per calcolarla in modo efficiente senza "esplodere" computazionalmente, si utilizza un **modello a bigrammi** (Catena di Markov):
 $$P(w_1, ..., w_n) = P(w_1)P(w_2|w_1)P(w_3|w_2)...P(w_n|w_{n-1})$$
 - $P(w_{i}|w_{i-1})$ -> probabilità che IN GENERALE la parola $w_{i}$ venga scritta dopo la parola $w_{i-1}$ 
@@ -2262,34 +2220,46 @@ In molti casi, una coppia di parole (bigramma) potrebbe non essere presente nel 
 $$P_{li}(w_k|w_{k-1}) = \lambda P_{uni}(w_k) + (1-\lambda)P_{bi}(w_k|w_{k-1})$$
 * **$\lambda$ (Peso):** Determina quanto "fidarsi" della parola singola rispetto alla coppia.
 * **Log-Probabilities:** Per evitare il *floating point underflow* (numeri troppo piccoli derivanti da molte moltiplicazioni), si lavora nel dominio dei logaritmi, trasformando i prodotti in somme: $$\log P(w_1...w_n) = \log P(w_1) + \sum \log P(w_i|w_{i-1})$$
-### 3. Channel Model *P(X|W)*: Probabilità di Errore
+#### 3. Channel Model *P(X|W)*: Probabilità di Errore
 Il termine $P(X|W)$ stima la probabilità che la parola $w$ venga digitata come $x$. 
 * Se l'errore è una *non-word*, si usano le matrici di confusione già viste.
 * **Novità per Real-Words:** Dobbiamo definire la probabilità che una parola sia stata scritta correttamente (**No Error**), ovvero $P(w|w)$.
     * Questa probabilità varia in base all'applicazione (es. 0.90 per testi informali, 0.99 per testi curati).
 
 
-## Strategie di Semplificazione e Ottimizzazione
-Calcolare la combinazione migliore tra tutti i candidati di ogni parola della frase è complesso.
-
-Per rendere il sistema trattabile, si adottano spesso delle semplificazioni:
-1. **Assunzione dell'Errore Singolo:** Si assume che in ogni frase ci sia **al massimo un errore** di spelling. Si generano quindi diverse varianti della frase originale modificando una sola parola alla volta e si sceglie la sequenza $W$ con $P(W)$ maggiore.
-2. **Peso del Prior ($\lambda$):** Si introduce un parametro di peso $\lambda$ per bilanciare il peso del modello linguistico rispetto al modello di errore:$$\hat{w} = \text{argmax}_{w \in V} P(x|w)P(w)^\lambda$$
-
 ## Hidden Markov Model (HMM) - Concetti Base
-Il problema della correzione può essere visto come un HMM dove:
-*   **Osservazioni:** Le parole scritte dall'utente (ciò che vediamo).
-*   **Stati Hidden:** Le parole effettivamente intese (ciò che vogliamo scoprire).
-*   **Probabilità di Transizione:** La probabilità che una parola segua l'altra (Bigramma).
-*   **Probabilità di Osservazione:** La probabilità che lo stato "nascosto" $w$ produca l'output $x$ (Channel Model).
+Il problema della correzione di una frase può essere modellato matematicamente attraverso un **Hidden Markov Model (HMM)**. Questo modello nasce per gestire sequenze simboliche o stati che evolvono nel tempo, basandosi sull'interazione tra due livelli distinti:
+1. **Le Osservazioni ($X$):** Rappresentano ciò che è visibile, ovvero la sequenza di parole digitate dall'utente (che possono contenere errori).
+2. **Gli Stati Nascosti ($W$):** Rappresentano ciò che vogliamo indovinare, ovvero la sequenza di parole corrette che l'utente aveva intenzione di scrivere.
 
+#### La Struttura del Modello: Transizioni ed Emissioni
+Il funzionamento dell'HMM si regge su due pilastri probabilistici:
+* **Probabilità di Transizione $P(w_i \mid w_{i-1})$:** Modella la successione delle parole. Indica quanto è probabile che una determinata parola segua la precedente (corrisponde al Modello Linguistico a bigrammi).
+* **Probabilità di Emissione $P(x_i \mid w_i)$:** Modella la scelta delle parole. Indica la probabilità che, data una parola intesa $w_i$, l'utente digiti effettivamente la stringa $x_i$ (corrisponde al Channel Model).
+
+#### Il Grafo Trellis e l'Algoritmo di Viterbi
+Visualmente, questa struttura viene rappresentata tramite un **Trellis** (o traliccio): un grafo a livelli dove ogni livello corrisponde a una posizione nella frase e ogni nodo rappresenta una possibile parola candidata.
 ![[Pasted image 20260329170701.png]]
+Se disponessimo di tutte le probabilità di transizione e di emissione, potremmo risolvere il problema "esattamente" trovando la sequenza $W$ più probabile. Tuttavia, provare ogni possibile combinazione di parole porterebbe a un'esplosione esponenziale dei calcoli. 
 
-## Ulteriori Miglioramenti
-Queste sono migliorie estreme
-* **Edits Ricchi:** Considerare errori più complessi della singola lettera (es. *ent* $\to$ *ant*, *ph* $\to$ *f*).
-* **Pronuncia:** Integrare modelli fonetici per pesare maggiormente candidati che suonano simili all'errore.
-* **Device-Specific:** Adattare il channel model al dispositivo (es. gli errori su una tastiera Android sono diversi da quelli su PC a causa della vicinanza dei tasti).
+Per questo si utilizza l'**Algoritmo di Viterbi**:
+*   Sfrutta la **programmazione dinamica**.
+*   Invece di esplorare tutti i percorsi, tiene traccia solo dei cammini migliori passo dopo passo.
+*   In pratica, trova il "cammino di costo minimo" all'interno del Trellis.
+
+#### Teoria vs Pratica nell'Information Retrieval
+Nonostante Viterbi sia il metodo teoricamente corretto, nel campo dell'IR risulta spesso troppo pesante computazionalmente (**overkill**). Per rendere il sistema trattabile, si adotta una **semplificazione pratica**:
+*   Si assume l'ipotesi **"One error per sentence"** (un solo errore per frase).
+*   Invece di esplorare l'intero grafo, si generano poche frasi candidate modificando una parola alla volta, si calcolano le loro probabilità e si sceglie la migliore.
+
+#### Il Rischio del Bias e il Peso del Prior ($\beta$)
+L'uso delle probabilità nasconde un rischio: il modello tende intrinsecamente a favorire parole molto frequenti. Questo può portare a errori di valutazione: una parola rara ma corretta potrebbe essere penalizzata a favore di una parola comune ma fuori contesto, portando il sistema a **correggere quando non serve** o a correggere male.
+
+Per bilanciare questo aspetto, si seguono le intuizioni di **Peter Norvig**:
+1. **Probabilità di Identità $P(w \mid w)$:** Si introduce la probabilità che una parola sia già corretta. Assumendo che l'utente scriva bene nella maggior parte dei casi, questo valore deve essere molto alto (0.9–0.99). Se è troppo alto, il sistema non correggerà mai; se è troppo basso, correggerà troppo spesso.
+2.  **Introduzione del peso $\beta$:** Per evitare che la frequenza della parola $P(W)$ domini eccessivamente la scelta, si utilizza la formula:
+    $$\hat{W} = \arg\max P(X \mid W) \cdot P(W)^\beta$$
+    Il parametro **$\beta$** serve a "smorzare" l'effetto del Language Model, riducendo l'impatto della frequenza delle parole comuni ed evitando che oscurino candidati meno frequenti ma più probabili in quel contesto specifico.
 
 
 ---
