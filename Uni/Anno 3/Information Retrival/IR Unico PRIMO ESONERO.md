@@ -1827,7 +1827,7 @@ salvo:
 
 ---
 
-# Variable Length Encoding
+# Variable Length Encoding (CONCETTO)
 Dopo il Gap Encoding abbiamo tanti numeri piccoli, e se usassimo 32 bit per ogni numero sprecheremmo spazio.
 
 Obiettivo:
@@ -1846,7 +1846,7 @@ Serve un encoding che:
 - sia decodificabile
 
 
-# Unary Code
+## APPROCCIO 1: Unary Code
 Codifica un numero `n` come:
 ```
 n volte 1 + 0 finale
@@ -1857,26 +1857,26 @@ Esempio:
 3 → 1110
 ```
 
-## Pro e contro
+### Pro e contro
 ✔ semplice  
 ❌ inefficiente per numeri grandi
 
 👉 utile solo quando i numeri sono molto piccoli
 
 
-# Gamma Code
+## APPROCCIO 2: Gamma Code
 Idea:
 - non codifico direttamente il numero
 - codifico:
     1. la lunghezza
     2. il valore
 
-## Struttura
+### Struttura
 ```
 unary(lunghezza) + parte binaria
 ```
 
-## 🔸 Passaggi (fondamentale)
+### 🔸 Passaggi (fondamentale)
 Prendiamo 13:
 #### 1. scrivo in binario
 - 13 → 1101
@@ -1896,11 +1896,11 @@ Prendiamo 13:
 >![[Pasted image 20260320181714.png]]
 
 
-## Perché è migliore
+### Perché è migliore
 - numeri piccoli → pochissimi bit
 - più efficiente dell'unario classico
 
-## Problema
+### Problema
 - più complesso
 - più lento da decodificare
 
@@ -1913,10 +1913,8 @@ Prendiamo 13:
 ![[Pasted image 20260320182003.png]]
 
 
----
-
-# VARIABLE BYTE ENCODING (VB)
-## Problema
+## APPROCCIO 3: VARIABLE BYTE ENCODING (VB)
+### Problema
 Dopo il **gap encoding**, le postings list diventano:
 - sequenze di **interi piccoli**
 - ma se li salvo con 32 bit → **spreco spazio**
@@ -1925,12 +1923,12 @@ Dopo il **gap encoding**, le postings list diventano:
 - compatta
 - decodificabile velocemente
 
-## Idea
+### Idea
 Usare un numero **variabile di byte** per rappresentare un intero.
 - numeri piccoli → pochi byte
 - numeri grandi → più byte
 
-## Struttura
+### Struttura
 Ogni byte ha 8 bit:
 - **1 bit di controllo (continuation bit)**
 - **7 bit di informazione**
@@ -1942,7 +1940,7 @@ Schema:
 - c = 1 → ultimo byte del numero
 - c = 0 → il numero continua nel byte successivo
 
-## Codifica
+### Codifica
 Dato un numero `n`:
 1. si rappresenta in base 128
 2. si divide in gruppi di 7 bit
@@ -1950,14 +1948,14 @@ Dato un numero `n`:
     - tutti con c = 0
     - tranne l’ultimo con c = 1
 
-## Esempi
-### Numero piccolo: 5
+#### Esempi
+##### Numero piccolo: 5
 - 5 < 128 → basta 1 byte
 ```
 10000101
 ```
 
-### Numero: 130
+##### Numero: 130
 - 130 = 1 * 128 + 2
 → due blocchi:
 - 0000001
@@ -1969,7 +1967,7 @@ Dato un numero `n`:
 10000010   (c = 1)
 ```
 
-## Decodifica
+### Decodifica
 Si leggono i byte in sequenza:
 1. si prendono i 7 bit utili
 2. si concatenano
@@ -1977,12 +1975,12 @@ Si leggono i byte in sequenza:
     - c = 0 → continua
     - c = 1 → fine numero
 
-## Proprietà
+### Proprietà
 - **self-delimiting** → non serve separatore
 - **byte-aligned** → veloce da leggere
 - **semplice da implementare**
 
-## Efficienza
+### Efficienza
 Funziona bene perché:
 - dopo gap encoding → molti numeri piccoli
 - quindi:
@@ -1991,7 +1989,7 @@ Funziona bene perché:
 
 👉 buona compressione + alta velocità
 
-## Limiti
+### Limiti
 - non è ottimale in termini di bit
 - spreca spazio -> usa byte interi anche per numeri piccoli
 
@@ -2012,11 +2010,9 @@ VB funziona perché:
 ![[Pasted image 20260325101101.png]]
 
 
----
+## APPROCCIO 4: SIMPLE-9 (Anh & Moffat, 2004)
 
-# SIMPLE-9 (Anh & Moffat, 2004)
-
-## Problema
+### Problema
 Con **Variable Byte**:
 - semplice
 - veloce  
@@ -2024,14 +2020,14 @@ Con **Variable Byte**:
 
 👉 spreca spazio perché lavora a **byte (8 bit)**
 
-## Idea di Simple-9
+### Idea di Simple-9
 Usare **word da 32 bit** invece di byte.
 
 👉 in 32 bit voglio mettere:
 - **più numeri possibile**
 - scegliendo come comprimerli
 
-## Struttura generale
+### Struttura generale
 Ogni blocco = **32 bit (4 byte)**
 
 Diviso in:
@@ -2041,7 +2037,7 @@ Diviso in:
 - **4 bit → selector (layout)**
 - **28 bit → dati compressi**
 
-## Concetto chiave (fondamentale)
+### Concetto chiave (fondamentale)
 👉 non salvo un numero per volta  
 👉 salvo **più numeri nello stesso blocco**
 
@@ -2051,7 +2047,7 @@ Come?
 
 👉 il selector dice **come interpretarli**
 
-# 5. Layout 
+### Layout 
 I 4 bit iniziali scelgono il formato:
 
 |Selector|Significato|
@@ -2071,7 +2067,7 @@ I 4 bit iniziali scelgono il formato:
 n * b ≤ 28
 ```
 
-# Esempio intuitivo
+#### Esempio intuitivo
 Hai questi gap:
 ```id="x3bq7k"
 1, 2, 1, 1, 3, 2, 1
@@ -2088,7 +2084,7 @@ Altro caso:
 → selector = 0
 ✔ uso tutto il blocco per 1 numero
 
-# Come funziona (processo)
+### Come funziona (processo)
 ### Encoding
 1. prendi i gap
 2. guarda quanti ne puoi mettere in 28 bit
