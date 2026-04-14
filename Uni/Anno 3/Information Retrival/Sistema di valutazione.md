@@ -130,4 +130,40 @@ Discounted -> ogni volta che scendo faccio una cosa che non ho capito porcaccio 
 
 
 
-FINO A SLIDE 36
+### E se i risultati non sono in una lista?
+Esempi in cui esiste un unico documento rilevante
+
+### Mean Reciprocal rank
+#### Reciprocal rank score
+È l'inverso rispetto alla posizione $$\frac 1 K$$
+
+### User behavior
+Cambiare l'ordine dei link in base ai click
+
+### Bias
+Comportamento dell'utente
+
+
+### Comparingb two rankings via clicks
+Ho una query e una serie di risultati DI DUE RANKING DIVERSI
+![[Pasted image 20260414163300.png]]
+
+Voglio capire quale dei due e' meglio
+Li interseziono
+![[Pasted image 20260414163329.png]]
+Elimino i duplicati
+![[Pasted image 20260414163345.png]]
+Li confronto
+![[Pasted image 20260414163403.png]]
+
+
+### Lexical Semantics
+Relazione di polisemia -> relazione che sussiste tra due parole se queste possono essere scambiate in una frase mantenendo il risultato identiche.
+
+Relazione paradigmatica -> relazione tra due parole quando queste sono DIVERSE (non sono sinonimi) ma possono essere inserite in una frase (una in sostituzione dell'altra) e la frase rimane comunque sensata
+- ma la frase potrebbe avere sensi diversi
+	- il lupo ha FAME
+	- il lupo ha SETE 
+
+
+
