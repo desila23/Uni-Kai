@@ -1,0 +1,114 @@
+# Valutazione nei Sistemi di Information Retrieval (IR)
+L’Information Retrieval è una disciplina altamente **empirica**. Per determinare se una tecnica (es. stemming, stop lists, pesatura tf-idf) sia efficace, è necessario un processo di valutazione rigoroso, basato su test ***sperimentali*** e ***replicabili***.
+
+## Il Benchmark di Valutazione
+Per misurare l'efficacia di un sistema IR (valutazione *ad hoc*), è necessario un **test collection** composto da tre elementi fondamentali:
+1. **Una collezione di documenti:** Un perimetro di analisi definito.
+2. **Un insieme di "bisogni informativi" (Information Needs):** Traducibili in query.
+3. **Giudizi di rilevanza (Gold Standard/Ground Truth):** Un'istanza (spesso binaria: rilevante/non rilevante) per ogni coppia query-documento, stabilita da esperti.
+### Differenza tra Bisogno Informativo e Query
+* **Information Need:** Ciò che l'utente vuole sapere.
+* **Query:** Ciò che l'utente scrive nel sistema.
+* **Criterio di Rilevanza:** Un documento è rilevante se soddisfa il *bisogno informativo*, non solo se contiene le parole della query.
+
+
+## Gold standard - metodo per costruire un data set annotato
+1. STEP 1: Sviluppo un insieme di query rappresentative
+2. STEP 2: Uso un sistema base che data una serie di parole recupera tutti i documenti utili -> VOGLIAMO MASSIMIZZARE LA RECALL
+	- bisogna utilizzare tecniche che facciano si che il perimetro di analisi sia contenuto
+3. STEP 3: per ogni query si hanno 1 o 2 esperti che stabiliscano la rilevanza dei documenti selezionati nello step 2
+
+
+## Metriche per Risultati Non Ordinati (Unranked Sets)
+Si basano su una decisione binaria di rilevanza applicata a un set di documenti restituiti.
+![[Pasted image 20260410174023.png]]![[Pasted image 20260410174033.png]]
+* **Precision (P):** Frazione dei documenti recuperati che sono effettivamente rilevanti. Misura l'accuratezza. $$P = \frac{\#(\text{rilevanti recuperati})}{\#(\text{recuperati})} = \frac{tp}{tp + fp}$$
+* **Recall (R):** Frazione dei documenti rilevanti totali che il sistema è riuscito a recuperare. Misura la completezza. $$R = \frac{\#(\text{rilevanti recuperati})}{\#(\text{rilevanti totali})} = \frac{tp}{tp + fn}$$
+>[!tip] Trucchetti per ricordarli
+>- recall -> il tn va buttato via
+>- la presicion -> chiama le p 
+
+#### Accuracy e Error
+![[Pasted image 20260410182625.png]]
+Entrambi non funzionano in IR perché i dati sono **skewed** (sbilanciati): oltre il 99.9% dei documenti è non rilevante. 
+Un sistema che risponde "sempre nulla" avrebbe un'accuratezza altissima (es. 99.9%) pur essendo totalmente inutile.
+
+
+### Bilanciare Precision e Recall
+#### F-Measure (Media Armonica)
+Per bilanciare P e R si utilizza la **media armonica**, che penalizza fortemente i valori bassi (a differenza della media aritmetica che può essere fuorviante).
+$$F = \frac{1}{\frac 1 2 (\frac{1}{P} + \frac{1}{R})} = \frac{2PR}{ P + R}$$
+
+Oppure si usa questa $$F = \frac{1}{\alpha \frac{1}{P} + (1-\alpha) \frac{1}{R}} = \frac{(\beta^2 + 1)PR}{\beta^2 P + R}$$
+*   **F1 (Balanced F):** Quando $\beta = 1$ (o $\alpha = 0.5$), precisione e recall hanno lo stesso peso.
+*   **$\beta > 1$:** Enfatizza la Recall (es. in ambito medico/legale).
+*   **$\beta < 1$:** Enfatizza la Precision.
+
+
+## Valutazione di Risultati Ordinati (Ranked Results)
+Mentre Precision e Recall "set-based" trattano i risultati come un insieme disordinato, le metriche "ranked" valutano la **capacità del sistema di posizionare i documenti rilevanti in cima alla lista**.
+### Precision@K (P@K)
+È la forma più semplice di valutazione del ranking, fondamentale per il Web Search (dove l'utente guarda solo i primi risultati).
+* **Calcolo:** Si considera solo il prefisso di lunghezza $K$ della lista dei risultati e si calcola la frazione di documenti rilevanti in quel segmento.
+    * *Esempio:* In una Top-5 con documenti $[R, N, R, N, N]$, la $P@5$ è $2/5 = 0.4$.
+* **Limiti:** 
+    1. **Ignora il Recall:** Non tiene conto di quanti documenti rilevanti totali esistano nella collezione.
+    2. **Instabilità:** Spostare un documento rilevante dalla posizione $K$ alla $K+1$ fa crollare la metrica a zero per quel segmento, rendendola molto sensibile al "rumore".
+![[Pasted image 20260410175459.png]]
+
+
+### Average Precision (AP) e MAP
+Per superare i limiti della P@K e valutare l'intero ranking, si usa l'**Average Precision**.
+#### Calcolo della Average Precision (AP) per una singola query:
+1. Si scorre la lista dei risultati.
+2. Ogni volta che si incontra un documento **rilevante** alla posizione $k$, si calcola la **Precision@k** in quel punto.
+3. Si fa la media di queste precisioni calcolate.
+    * **Formula:** $$AP = \frac{1}{\text{Tot. Rilevanti}} \sum_{k=1}^{n} (P@k \times \text{rel}(k))$$ dove $\text{rel}(k)$ è 1 se il doc è rilevante, 0 altrimenti.
+    * *Importante:* Se un documento rilevante non viene mai recuperato, la sua precisione viene considerata **zero**.
+![[Pasted image 20260410175802.png]]
+
+#### Mean Average Precision (MAP):
+È la media delle AP su tutte le query ($Q$) del benchmark.
+* È una misura di **Macro-averaging**: ogni query ha lo stesso peso nel risultato finale, indipendentemente da quanti documenti rilevanti possiede.
+* È considerata la metrica più stabile e affidabile per confrontare diversi algoritmi di ranking.
+![[Pasted image 20260410175846.png]]
+
+
+### Rappresentazione Grafica e Interpolazione
+L'andamento di un sistema IR viene visualizzato tramite un grafico **Recall-Precision**.
+* **Andamento a dente di sega:** La precisione scende quando incontriamo documenti non rilevanti (la Recall resta ferma) e "salta" verso l'alto quando troviamo un documento rilevante (la Recall aumenta).
+* **Precisione Interpolata ($p_{interp}$):** Per eliminare i "denti" e rendere la curva decrescente, si usa la regola: la precisione a un livello di recall $r$ è pari alla **massima precisione** osservata a qualsiasi livello di recall superiore o uguale a $r$.
+    * **Formula:** $P(R)= max\{P' : (R' \ge R) \land (R', P') \in S\}$.
+![[Pasted image 20260410180343.png]]
+
+
+## Valutazione con Rilevanza Graduata: NDCG
+Quando la rilevanza non è binaria (Sì/No) ma scalare (es. da 0 a 3, dove 3 è "perfetto" e 1 è "marginale"), le metriche precedenti non bastano. 
+Si usa il **Normalized Discounted Cumulative Gain (NDCG)**.
+
+### Le due Assunzioni Fondamentali:
+1. **Utilità:** Documenti molto rilevanti sono molto più utili di quelli marginali.
+2. **Posizione:** Più un documento rilevante è in basso, meno è utile (perché è meno probabile che l'utente lo esamini).
+
+### Step 1: Cumulative Gain (CG)
+È la somma semplice dei valori di rilevanza dei primi $n$ documenti.
+*   $CG_n = r_1 + r_2 + \dots + r_n$
+*   *Difetto:* Non penalizza i documenti rilevanti messi in fondo alla lista.
+
+### Step 2: Discounted Cumulative Gain (DCG)
+Introduce una penalità (sconto) logaritmica in base alla posizione $i$ del documento.
+*   **Formula standard:** $$DCG_p = r_1 + \sum_{i=2}^{p} \frac{r_i}{\log_2(i)}$$
+*   **Formula alternativa:** $$\sum_{i=1}^{p} \frac{2^{r_i} - 1}{\log_2(i+1)}$$
+    *   *Nota:* Questa versione (usata dai grandi motori di ricerca) enfatizza enormemente i documenti con rilevanza alta (es. un grado 3 diventa $2^3-1=7$).
+
+### Step 3: Normalizzazione (NDCG)
+Il valore DCG dipende dalla query: alcune query hanno molti documenti "grado 3", altre solo "grado 1". Per confrontarle, serve la normalizzazione:
+1. Si calcola il DCG del sistema.
+2. Si calcola l'**IDCG (Ideal DCG)**: il DCG che si otterrebbe se il sistema restituisse i documenti ordinati perfettamente per grado di rilevanza (es. tutti i 3, poi tutti i 2, poi i 1).
+3. $NDCG = \frac {DCG} {IDCG}$.
+    * Il risultato è un valore tra **0 e 1**, dove 1 indica un ordinamento perfetto secondo il Ground Truth.
+
+> **Conclusione:** NDCG risponde a:
+👉 “quanto il mio ranking è vicino a quello perfetto, tenendo conto di quanto conta ogni posizione”.
+
+

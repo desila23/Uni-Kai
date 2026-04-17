@@ -1,4 +1,4 @@
-# CH01 - Ripasso probabilità
+# 1.CH01 - Ripasso probabilità
 ### ALGORITMI
 - Verifica dell'identità polinomiale
 - **DEFINIZIONE DI ALGORITMO RANDOMIZZATO** -> 11-12
@@ -21,7 +21,7 @@
 	- *applicazione della legge* -> 47-52
 	- *applicazione sul test della moltiplicazione tra matrici* -> 53-57
 
-# MITZ-UPFAL CH02
+# 2. MITZ-UPFAL CH02
 ### ALGORITMI
 - **Quick Sort Definizione** -> 18
 	- dimostrazione (?) -> 19-23
@@ -42,7 +42,7 @@
 - **Coupon Collector's Problem** -> 44-46
 
 
-# MITZ-UPFAL CH03
+# 3. MITZ-UPFAL CH03
 ### ALGORITMI
 - **Algoritmo per il calcolo della mediana** -> 16
 	- *randomizzato* -> 17-21
@@ -69,3 +69,37 @@
 - **La (debole) legge dei grandi numeri** -> 42
 
 - **UNION BOUND** -> ?
+
+
+
+>[!tip] da qui in poi seguirò anche il pdf di mirko
+# 4. Cont resolution andy 
+### ALGORITMI
+- Load balancing -> 20
+- Global min cut
+- Content resolution -> 19 + slide 7
+
+### INFO UTILI
+- Content resolution -> 19 + slide 7
+- Chernoff bounds -> 8 + slide 11-12
+- Hashing -> 20-21 + HASH FUNCTION LUCIO ANDY
+
+
+# 5. Ch03 ABD Andy SLIDES 3 + Hash function lucio andy
+### ALGORITMI
+- Algoritmo: Doubling/Halving Technique -> 25
+- MIN-HASH -> 29
+- CALCOLA DELLA MATRICE DELLE FIRME -> 29
+
+### INFO UTILI
+- hashing universale -> 21
+- esempi famiglie hash universali -> 22-23
+- perfect hashing -> 23
+- problema del dizionario -> 23
+- tabelle hash -> 24
+- INTRODUZIONE -> 25 
+- Document Similarity -> 25-26 
+	- Shingling -> 26 + slide 15
+	- Min-hashing -> 26 + slide 30
+- Locality-Sensitive Hashing  -> 30
+
