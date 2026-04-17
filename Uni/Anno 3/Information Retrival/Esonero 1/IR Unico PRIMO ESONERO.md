@@ -776,29 +776,15 @@ Questo numero mostra chiaramente che la costruzione dell’indice deve gestire *
 
 ## Token vs Term
 Nel processo di indicizzazione bisogna distinguere tra:
-### Token
-Un **token** è una parola che appare nel testo dei documenti.
-
-Esempio:
-```
-the
-caesar
-war
-```
-
-Un token può comparire **molte volte** nella collezione.
-
-### Term
-Un **term** è una parola **distinta** che appare nel dictionary dell’indice.
-Ogni termine compare **una sola volta nel dictionary**, anche se appare in molti documenti.
-
-Esempio:
-```
-dictionary:
-the
-caesar
-war
-```
+- **Token**
+    - sono **le parole effettivamente estratte dal testo dei documenti**
+    - rappresentano **tutte le occorrenze delle parole**, nell’ordine in cui appaiono nei documenti
+- Il **token stream** è l’insieme di tutte le coppie:
+    - `(termID, docID)`
+    - generate durante il parsing dei documenti.
+- **Term**
+    - sono **le parole distinte del vocabolario**
+    - cioè **le parole nel dizionario dell’indice**, ogni parola compare **una sola volta**
 
 ### Differenza di lunghezza media
 Nella slide sopra si osserva che:
@@ -950,7 +936,6 @@ documento 23
 Queste coppie vengono accumulate in memoria finché il blocco non è pieno.
 
 #### Ordinamento del blocco
-Quando il blocco è pieno:
 1. le coppie `(termID, docID)` vengono **ordinate**
 2. si costruisce l’**inverted index del blocco**
 3. il risultato viene scritto su **disco**
@@ -1319,33 +1304,6 @@ I dati sono coerenti su tutte le macchine
 
 
 >[!danger] ⚠️ Nella pratica non si possono avere tutte e tre perfettamente (CAP theorem)
-
-
----
-
-# MapReduce
-È il modello usato per implementare tutto questo.
-
-Schema generale:
-```
-map: input → lista(k, v)
-reduce: (k, lista(v)) → output
-```
-
-Nel nostro caso:
-### Map
-```
-documenti → (term, docID)
-```
-
-### Reduce
-```
-(term, lista(docID)) → postings list
-```
-
-È importante perché:
-- divide il lavoro automaticamente
-- scala su cluster molto grandi
 
 
 ---
@@ -1914,15 +1872,6 @@ Prendiamo 13:
 
 
 ## APPROCCIO 3: VARIABLE BYTE ENCODING (VB)
-### Problema
-Dopo il **gap encoding**, le postings list diventano:
-- sequenze di **interi piccoli**
-- ma se li salvo con 32 bit → **spreco spazio**
-
-👉 serve una rappresentazione:
-- compatta
-- decodificabile velocemente
-
 ### Idea
 Usare un numero **variabile di byte** per rappresentare un intero.
 - numeri piccoli → pochi byte
@@ -2103,7 +2052,7 @@ Altro caso:
 ---
 
 
-# Dictionaries and Tolerant Retrieval
+# 4. Dictionaries and Tolerant Retrieval
 In un sistema di Information Retrieval, il primo passo dopo la ricezione di una query è il **Vocabulary Lookup**: verificare se i termini della query esistono nel dizionario e recuperare i puntatori alle relative *postings lists*. Tuttavia, il sistema deve essere "tollerante" verso query non standard o errate.
 
 
